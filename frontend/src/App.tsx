@@ -3,16 +3,13 @@ import { PDFViewer } from "@react-pdf/renderer";
 import "./index.css";
 import ConfirmationForm from "./components/form/ConfirmationForm.tsx";
 import FlightConfirmationPdf from "./components/pdf/FlightConfirmationPdf.tsx";
-import type { ConfirmationData } from "./types.ts";
+import { PassengerType, type ConfirmationData } from "./types.ts";
 import { Download } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
 const INITIAL_DATA: ConfirmationData = {
   locator: "UKIQHA",
-  airline: "GOL",
-  passengers: [
-    { id: "1", name: "MANUEL SILVEIRA ORIHUELA", document: "1272152279458" },
-  ],
+  passengers: [{ name: "MANUEL SILVEIRA ORIHUELA", type: PassengerType.ADULT }],
   baggage: {
     personalItem: 1,
     carryOn: 1,
@@ -20,7 +17,6 @@ const INITIAL_DATA: ConfirmationData = {
   },
   flights: [
     {
-      id: "1",
       flightNumber: "G31246",
       date: "2026-01-08",
       duration: "3h0m",
@@ -28,7 +24,6 @@ const INITIAL_DATA: ConfirmationData = {
       destination: { city: "Manaus", code: "MAO", time: "02:40" },
     },
     {
-      id: "2",
       flightNumber: "G31743",
       date: "2026-01-09",
       duration: "4h0m",
@@ -36,7 +31,6 @@ const INITIAL_DATA: ConfirmationData = {
       destination: { city: "Brasília", code: "BSB", time: "07:25" },
     },
     {
-      id: "3",
       flightNumber: "G31756",
       date: "2026-01-09",
       duration: "2h0m",
@@ -44,15 +38,16 @@ const INITIAL_DATA: ConfirmationData = {
       destination: { city: "Curitiba", code: "CWB", time: "10:45" },
     },
   ],
-  agency: {
+  airline: {
     name: "Viajando com Sucesso",
     contactPhone: "0800 704 0465",
     logoUrl: "https://viajaNet.com.br/assets/img/logo-viajanet.png", // Placeholder
+    checkInUrl: "https://google.com",
   },
-  qrCodeText: "https://google.com",
 };
 
 function App() {
+  // TODO: Add an apply button and refresh the data, don't apply live changes.
   const [data, setData] = useState<ConfirmationData>(INITIAL_DATA);
 
   return (
@@ -70,7 +65,7 @@ function App() {
             {({ loading }) => (
               <button className="btn-primary" disabled={loading}>
                 <Download size={16} style={{ marginRight: 5 }} />
-                {loading ? "Generando..." : "Descargar PDF"}
+                {loading ? "Gerando..." : "Baixar PDF"}
               </button>
             )}
           </PDFDownloadLink>

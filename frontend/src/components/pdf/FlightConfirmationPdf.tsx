@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Document, Page, Text, View, Image } from "@react-pdf/renderer";
 import type { ConfirmationData } from "../../types";
 import { styles } from "./PdfStyles";
@@ -12,9 +12,7 @@ interface FlightConfirmationPdfProps {
 // TODO: Fix dividers at the end of the file
 // TODO: Add constants for texts and make it possible to use spanish and portuguese
 // TODO: Add a sections for return trips
-const FlightConfirmationPdf: React.FC<FlightConfirmationPdfProps> = ({
-  data,
-}) => {
+const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(({ data }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -287,6 +285,8 @@ const FlightConfirmationPdf: React.FC<FlightConfirmationPdfProps> = ({
       </Page>
     </Document>
   );
-};
+});
+
+FlightConfirmationPdf.displayName = "FlightConfirmationPdf";
 
 export default FlightConfirmationPdf;

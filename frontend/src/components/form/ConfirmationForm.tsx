@@ -99,8 +99,6 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
 
   return (
     <div className="form-container">
-      <h2 style={{ marginBottom: "1rem" }}>Configuração</h2>
-
       <div className="form-section">
         <h3>Companhia Aérea & Voo</h3>
         <div className="form-group">

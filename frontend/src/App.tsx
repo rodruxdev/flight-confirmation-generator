@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { PDFViewer } from "@react-pdf/renderer";
 import "./index.css";
 import ConfirmationForm from "./components/form/ConfirmationForm.tsx";
-import FlightConfirmationPdf from "./components/pdf/FlightConfirmationPdf.tsx";
 import { PassengerType, type ConfirmationData } from "./types.ts";
-import { Download } from "lucide-react";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Check } from "lucide-react";
+import { PdfPreviewArea } from "./components/pdf/PdfPreviewArea.tsx";
 
 const INITIAL_DATA: ConfirmationData = {
   locator: "UKIQHA",
@@ -47,35 +45,26 @@ const INITIAL_DATA: ConfirmationData = {
 };
 
 function App() {
-  // TODO: Add an apply button and refresh the data, don't apply live changes.
-  const [data, setData] = useState<ConfirmationData>(INITIAL_DATA);
+  const [formData, setFormData] = useState<ConfirmationData>(INITIAL_DATA);
+  const [pdfData, setPdfData] = useState<ConfirmationData>(INITIAL_DATA);
+
+  const handleApply = () => {
+    setPdfData(formData);
+  };
 
   return (
     <div className="app-container">
       <div className="sidebar">
-        <ConfirmationForm data={data} onChange={setData} />
-      </div>
-      <div className="preview-area">
-        <div className="preview-header">
-          <h2>Visualização</h2>
-          <PDFDownloadLink
-            document={<FlightConfirmationPdf data={data} />}
-            fileName={`confirmacion-${data.locator}.pdf`}
-          >
-            {({ loading }) => (
-              <button className="btn-primary" disabled={loading}>
-                <Download size={16} style={{ marginRight: 5 }} />
-                {loading ? "Gerando..." : "Baixar PDF"}
-              </button>
-            )}
-          </PDFDownloadLink>
+        <div className="sidebar-header">
+          <h2 style={{ marginBottom: "1rem" }}>Configuração</h2>
+          <button className="btn-apply" onClick={handleApply}>
+            <Check size={16} style={{ marginRight: 5 }} />
+            Aplicar Alterações
+          </button>
         </div>
-        <div className="pdf-wrapper">
-          <PDFViewer width="100%" height="100%" className="pdf-viewer">
-            <FlightConfirmationPdf data={data} />
-          </PDFViewer>
-        </div>
+        <ConfirmationForm data={formData} onChange={setFormData} />
       </div>
+      <PdfPreviewArea pdfData={pdfData} />
     </div>
   );
 }

@@ -2,6 +2,8 @@ import { useState } from "react";
 import "./index.css";
 import ConfirmationForm from "./components/form/ConfirmationForm.tsx";
 import { PassengerType, type ConfirmationData } from "./types.ts";
+import { AirlinesInfo } from "./constants.ts";
+import { Airlines } from "./types.ts";
 import { Check } from "lucide-react";
 import { PdfPreviewArea } from "./components/pdf/PdfPreviewArea.tsx";
 
@@ -37,9 +39,7 @@ const INITIAL_DATA: ConfirmationData = {
     },
   ],
   airline: {
-    name: "Viajando com Sucesso",
-    contactPhone: "0800 704 0465",
-    logoUrl: "https://viajaNet.com.br/assets/img/logo-viajanet.png", // Placeholder
+    ...AirlinesInfo[Airlines.GOL],
     checkInUrl: "https://google.com",
   },
 };

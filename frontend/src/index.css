@@ -116,16 +116,19 @@ a {
 input[type="text"],
 input[type="number"],
 input[type="date"],
-input[type="time"] {
+input[type="time"],
+select {
   width: 100%;
   padding: 8px;
   border: 2px solid #8f8f8f;
   border-radius: 4px;
   font-size: 16px;
   font-family: inherit;
+  background-color: #fff;
 }
 
-input:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: #007bff;
 }

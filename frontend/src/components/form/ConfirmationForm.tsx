@@ -4,7 +4,9 @@ import {
   type Passenger,
   type FlightLeg,
   PassengerType,
+  Airlines,
 } from "../../types";
+import { AirlinesInfo, PassengerTypeLabels } from "../../constants";
 import { Plus, Trash2 } from "lucide-react";
 
 interface ConfirmationFormProps {
@@ -22,6 +24,26 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
 
   const updateAirline = (field: keyof typeof data.airline, value: unknown) => {
     onChange({ ...data, airline: { ...data.airline, [field]: value } });
+  };
+
+  const handleAirlineChange = (airlineKey: Airlines) => {
+    const selectedAirline = AirlinesInfo[airlineKey];
+    onChange({
+      ...data,
+      airline: {
+        ...selectedAirline,
+        checkInUrl: data.airline.checkInUrl, // Preserve checkInUrl
+      },
+    });
+  };
+
+  const getCurrentAirlineKey = (): Airlines => {
+    const airlineName = data.airline.name;
+    if (airlineName === AirlinesInfo[Airlines.GOL].name) return Airlines.GOL;
+    if (airlineName === AirlinesInfo[Airlines.AZUL].name) return Airlines.AZUL;
+    if (airlineName === AirlinesInfo[Airlines.LATAM].name)
+      return Airlines.LATAM;
+    return Airlines.GOL; // Default to GOL
   };
 
   const updateBaggage = (field: keyof typeof data.baggage, value: unknown) => {
@@ -103,11 +125,14 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
         <h3>Companhia Aérea & Voo</h3>
         <div className="form-group">
           <label>Companhia Aérea</label>
-          <input
-            type="text"
-            value={data.airline.name}
-            onChange={(e) => updateAirline("name", e.target.value)}
-          />
+          <select
+            value={getCurrentAirlineKey()}
+            onChange={(e) => handleAirlineChange(e.target.value as Airlines)}
+          >
+            <option value={Airlines.GOL}>{AirlinesInfo.GOL.name}</option>
+            <option value={Airlines.AZUL}>{AirlinesInfo.Azul.name}</option>
+            <option value={Airlines.LATAM}>{AirlinesInfo.Latam.name}</option>
+          </select>
         </div>
         <div className="form-group">
           <label>Localizador</label>
@@ -143,7 +168,25 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                 <Trash2 size={16} />
               </button>
             </div>
-            {/* TODO: Add passenger type select */}
+            <div className="form-group" style={{ marginTop: "0.5rem" }}>
+              <label>Tipo de Passageiro</label>
+              <select
+                value={p.type}
+                onChange={(e) =>
+                  updatePassenger(
+                    index,
+                    "type",
+                    e.target.value as PassengerType
+                  )
+                }
+              >
+                {Object.values(PassengerType).map((type) => (
+                  <option key={type} value={type}>
+                    {PassengerTypeLabels[type]}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         ))}
       </div>

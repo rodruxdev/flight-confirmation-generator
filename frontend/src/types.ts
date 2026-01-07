@@ -1,7 +1,13 @@
-export const enum PassengerType {
+export enum PassengerType {
   ADULT = "ADULT",
   CHILD = "CHILD",
   PET = "PET",
+}
+
+export enum Airlines {
+  GOL = "GOL",
+  LATAM = "Latam",
+  AZUL = "Azul",
 }
 
 export interface Passenger {

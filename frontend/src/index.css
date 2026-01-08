@@ -138,6 +138,10 @@ select:focus {
   gap: 10px;
 }
 
+.row-space-between {
+  justify-content: space-between;
+}
+
 .card-item {
   background: #f9f9f9;
   padding: 10px;
@@ -152,12 +156,6 @@ select:focus {
   font-size: 10px;
   padding: 2px 6px;
   border-radius: 4px;
-}
-
-.header-row {
-  justify-content: flex-end;
-  align-items: center;
-  margin-bottom: 5px;
 }
 
 .location-group {

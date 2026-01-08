@@ -119,6 +119,51 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
     updateField("flights", updatedFlights);
   };
 
+  // Return Flight Handlers
+  const addReturnFlight = () => {
+    const cleanFlight: FlightLeg = {
+      flightNumber: "G3 5678",
+      date: new Date().toISOString().split("T")[0],
+      duration: "1h30m",
+      origin: { city: "Cidade Volta", code: "DST", time: "18:00" },
+      destination: { city: "Cidade Origem", code: "ORG", time: "19:30" },
+    };
+
+    const currentReturnFlights = data.returnFlights || [];
+    updateField("returnFlights", [...currentReturnFlights, cleanFlight]);
+  };
+
+  const removeReturnFlight = (id: number) => {
+    if (!data.returnFlights) return;
+    const updatedFlights = [...data.returnFlights];
+    updatedFlights.splice(id, 1);
+    updateField("returnFlights", updatedFlights);
+  };
+
+  const updateReturnFlight = (id: number, field: keyof FlightLeg, value: unknown) => {
+    if (!data.returnFlights) return;
+    const flightToUpdate = { ...data.returnFlights[id], [field]: value };
+    const updatedFlights = [...data.returnFlights];
+    updatedFlights[id] = flightToUpdate;
+    updateField("returnFlights", updatedFlights);
+  };
+
+  const updateReturnFlightLocation = (
+    id: number,
+    type: "origin" | "destination",
+    subField: "city" | "code" | "time",
+    value: string
+  ) => {
+    if (!data.returnFlights) return;
+    const flightToUpdate = {
+      ...data.returnFlights[id],
+      [type]: { ...data.returnFlights[id][type], [subField]: value },
+    };
+    const updatedFlights = [...data.returnFlights];
+    updatedFlights[id] = flightToUpdate;
+    updateField("returnFlights", updatedFlights);
+  };
+
   return (
     <div className="form-container">
       <div className="form-section">
@@ -233,16 +278,8 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
         </div>
         {data.flights.map((f, index) => (
           <div key={`flight-${index}`} className="card-item">
-            <div className="row header-row">
-              <button
-                className="btn-delete"
-                onClick={() => removeFlight(index)}
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
-
-            <div className="row">
+            <div className="row row-space-between">
+              <div className="row">
               <div className="form-group">
                 <label>Número</label>
                 <input
@@ -261,6 +298,13 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   onChange={(e) => updateFlight(index, "date", e.target.value)}
                 />
               </div>
+              </div>
+              <button
+                className="btn-delete"
+                onClick={() => removeFlight(index)}
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
 
             {/* Origin */}
@@ -352,6 +396,164 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   value={f.destination.time}
                   onChange={(e) =>
                     updateFlightLocation(
+                      index,
+                      "destination",
+                      "time",
+                      e.target.value
+                    )
+                  }
+                  style={{ flex: 1 }}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="form-section">
+        <div className="section-header">
+          <h3>Voos de Volta (Opcional)</h3>
+          {(!data.returnFlights || data.returnFlights.length === 0) ? (
+            <button className="btn-primary" onClick={addReturnFlight} style={{ fontSize: '0.8rem', padding: '4px 8px' }}>
+              Adicionar Volta
+            </button>
+          ) : (
+             <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className="btn-delete"
+                  title="Remover toda a volta"
+                  onClick={() => onChange({ ...data, returnFlights: [] })}
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: '#e74c3c' }}
+                >
+                  <Trash2 size={14} /> Remover Seção
+                </button>
+                <button className="btn-icon" onClick={addReturnFlight}>
+                  <Plus size={16} />
+                </button>
+             </div>
+          )}
+        </div>
+        
+        {data.returnFlights && data.returnFlights.map((f, index) => (
+          <div key={`return-flight-${index}`} className="card-item">
+            <div className="row row-space-between">
+              <div className="row">
+              <div className="form-group">
+                <label>Número</label>
+                <input
+                  type="text"
+                  value={f.flightNumber}
+                  onChange={(e) =>
+                    updateReturnFlight(index, "flightNumber", e.target.value)
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <label>Data</label>
+                <input
+                  type="date"
+                  value={f.date}
+                  onChange={(e) => updateReturnFlight(index, "date", e.target.value)}
+                />
+              </div>
+              </div>
+              <button
+                className="btn-delete"
+                onClick={() => removeReturnFlight(index)}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+
+            {/* Origin */}
+            <div className="location-group">
+              <span className="label-small">ORIGEM ({f.origin.code})</span>
+              <div className="row">
+                <input
+                  type="text"
+                  placeholder="Cidade"
+                  value={f.origin.city}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "origin",
+                      "city",
+                      e.target.value
+                    )
+                  }
+                  style={{ flex: 2 }}
+                />
+                <input
+                  type="text"
+                  placeholder="IATA"
+                  value={f.origin.code}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "origin",
+                      "code",
+                      e.target.value
+                    )
+                  }
+                  maxLength={3}
+                  style={{ flex: 1 }}
+                />
+                <input
+                  type="time"
+                  value={f.origin.time}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "origin",
+                      "time",
+                      e.target.value
+                    )
+                  }
+                  style={{ flex: 1 }}
+                />
+              </div>
+            </div>
+
+            {/* Destination */}
+            <div className="location-group">
+              <span className="label-small">
+                DESTINO ({f.destination.code})
+              </span>
+              <div className="row">
+                <input
+                  type="text"
+                  placeholder="Cidade"
+                  value={f.destination.city}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "destination",
+                      "city",
+                      e.target.value
+                    )
+                  }
+                  style={{ flex: 2 }}
+                />
+                <input
+                  type="text"
+                  placeholder="IATA"
+                  value={f.destination.code}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "destination",
+                      "code",
+                      e.target.value
+                    )
+                  }
+                  maxLength={3}
+                  style={{ flex: 1 }}
+                />
+                <input
+                  type="time"
+                  value={f.destination.time}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
                       index,
                       "destination",
                       "time",

@@ -187,6 +187,17 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
             onChange={(e) => updateField("locator", e.target.value)}
           />
         </div>
+        <div className="form-group">
+          <label>Idioma do PDF</label>
+          <select
+            value={data.language}
+            onChange={(e) => updateField("language", e.target.value)}
+          >
+            <option value="pt">Português</option>
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
+        </div>
       </div>
 
       <div className="form-section">

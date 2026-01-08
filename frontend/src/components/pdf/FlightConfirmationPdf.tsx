@@ -1,9 +1,9 @@
 import React, { memo, useMemo } from "react";
 import { Document, Page, Text, View, Image } from "@react-pdf/renderer";
-import type { ConfirmationData, FlightLeg } from "../../types";
+import type { ConfirmationData, FlightLeg, Language } from "../../types";
 import { styles } from "./PdfStyles";
 import dayjs from "dayjs";
-import { translations, type Language } from "./TranslationConstants";
+import { translations } from "./TranslationConstants";
 import { UserIcon, ChildIcon, PawIcon, BagIcon, PlaneIcon, BackpackIcon } from "./PdfIcons";
 
 interface FlightConfirmationPdfProps {
@@ -187,7 +187,7 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(({ data, locale =
                  <Text style={styles.legalText}>{t.legalText}</Text>
                  
                  <Text style={{ fontWeight: 'bold', fontSize: 10, color: '#555', marginTop: 10 }}>{t.boardingInstructions}</Text>
-                 {t.boardingList.map((item, idx) => (
+                 {t.boardingList.map((item: string, idx: number) => (
                       <Text key={idx} style={{ fontSize: 7, color: '#666', marginTop: 2 }}>• {item}</Text>
                   ))}
                   

@@ -1,6 +1,6 @@
-export type Language = 'pt' | 'es' | 'en';
+import type { Language } from "../../types";
 
-export const translations = {
+export const translations: Record<Language, any> = {
   pt: {
     bookingReference: "Localizador",
     passengerInfo: "Informações da sua passagem",

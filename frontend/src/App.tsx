@@ -42,6 +42,7 @@ const INITIAL_DATA: ConfirmationData = {
     ...AirlinesInfo[Airlines.GOL],
     checkInUrl: "https://google.com",
   },
+  language: "pt",
 };
 
 function App() {

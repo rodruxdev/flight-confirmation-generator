@@ -45,6 +45,8 @@ export interface AirlineInfo {
   checkInUrl?: string;
 }
 
+export type Language = "pt" | "es" | "en";
+
 export interface ConfirmationData {
   locator: string;
   passengers: Passenger[];
@@ -52,4 +54,5 @@ export interface ConfirmationData {
   flights: FlightLeg[];
   returnFlights?: FlightLeg[];
   airline: AirlineInfo;
+  language: Language;
 }

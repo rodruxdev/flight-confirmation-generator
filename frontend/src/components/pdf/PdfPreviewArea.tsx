@@ -14,7 +14,7 @@ export const PdfPreviewArea = memo<PdfPreviewAreaProps>(({ pdfData }) => {
       <div className="preview-header">
         <h2>Visualização</h2>
         <PDFDownloadLink
-          document={<FlightConfirmationPdf data={pdfData} />}
+          document={<FlightConfirmationPdf data={pdfData} locale={pdfData.language} />}
           fileName={`confirmacion-${pdfData.locator}.pdf`}
         >
           {({ loading }) => (
@@ -27,7 +27,7 @@ export const PdfPreviewArea = memo<PdfPreviewAreaProps>(({ pdfData }) => {
       </div>
       <div className="pdf-wrapper">
         <PDFViewer width="100%" height="100%" className="pdf-viewer">
-          <FlightConfirmationPdf data={pdfData} />
+          <FlightConfirmationPdf data={pdfData} locale={pdfData.language} />
         </PDFViewer>
       </div>
     </div>

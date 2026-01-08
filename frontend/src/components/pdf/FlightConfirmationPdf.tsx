@@ -1,291 +1,205 @@
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import { Document, Page, Text, View, Image } from "@react-pdf/renderer";
-import type { ConfirmationData } from "../../types";
+import type { ConfirmationData, FlightLeg } from "../../types";
 import { styles } from "./PdfStyles";
 import dayjs from "dayjs";
+import { translations, type Language } from "./TranslationConstants";
+import { UserIcon, ChildIcon, PawIcon, BagIcon, PlaneIcon, BackpackIcon } from "./PdfIcons";
 
 interface FlightConfirmationPdfProps {
   data: ConfirmationData;
+  locale?: Language;
 }
 
-// TODO: Fix icon placeholders
-// TODO: Fix dividers at the end of the file
-// TODO: Add constants for texts and make it possible to use spanish and portuguese
-// TODO: Add a sections for return trips
-const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(({ data }) => {
+const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(({ data, locale = 'pt' }) => {
+  const t = translations[locale] || translations.pt;
+
+  // Prioritize explicit returnFlights if available, otherwise fallback to heuristic
+  const flightGroups = useMemo(() => {
+    if (data.returnFlights && data.returnFlights.length > 0) {
+        return { outbound: data.flights, inbound: data.returnFlights };
+    }
+    return { outbound: data.flights, inbound: [] };
+  }, [data.flights, data.returnFlights]);
+
+  const renderFlightSection = (flights: FlightLeg[], title: string) => {
+      if(!flights.length) return null;
+      return (
+        <View style={{ marginBottom: 20 }}>
+            {/* Title Row */}
+            <View style={styles.flightSectionTitle}>
+                <PlaneIcon size={14} color="#f05a22" style={{ marginRight: 5 }} />
+                <Text style={styles.flightTitleText}>{title}</Text>
+                 <Text style={{ fontSize: 10, color: "#666", marginLeft: 5 }}>
+                    {t.start}:
+                </Text>
+            </View>
+            
+            {/* Flight Rows */}
+            {flights.map((leg, i) => (
+                <View key={i} style={styles.flightLeg}>
+                     <View style={styles.flightInfoRow}>
+                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Text style={styles.flightNumber}>{leg.flightNumber}</Text>
+                            <Text style={styles.flightDate}>{dayjs(leg.date).format("DD/MM/YYYY")}</Text>
+                            <Text style={styles.timeTag}>{leg.origin.time}</Text>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'baseline', marginLeft: 15 }}>
+                                <Text style={{ fontSize: 9, color: '#333' }}>{leg.origin.city}</Text>
+                                <Text style={{ fontSize: 16, fontWeight: 'bold', marginLeft: 5 }}>{leg.origin.code}</Text>
+                            </View>
+
+                            <View style={styles.durationContainer}>
+                                <Text style={{ fontSize: 8, color: '#ccc' }}>.....</Text>
+                                <PlaneIcon size={12} color="#f05a22" style={{ marginHorizontal: 2 }} />
+                                <Text style={{ fontSize: 9, fontWeight: 'bold'}}>{leg.duration}</Text>
+                                <Text style={{ fontSize: 8, color: '#ccc' }}>.....</Text>
+                            </View>
+
+                             <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+                                <Text style={{ fontSize: 16, fontWeight: 'bold', marginRight: 5 }}>{leg.destination.code}</Text>
+                                <Text style={{ fontSize: 9, color: '#333' }}>{leg.destination.city}</Text>
+                            </View>
+                         </View>
+                         
+                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Text style={styles.timeTag}>{leg.destination.time}</Text>
+                            <Text style={[styles.flightDate, { marginLeft: 5 }]}>
+                                {dayjs(leg.date).format("DD/MM/YYYY")}
+                            </Text>
+                         </View>
+                     </View>
+                </View>
+            ))}
+        </View>
+      );
+  };
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.agencySection}>
-            {/* TODO: Add viajando com sucesso logo */}
-            {data.airline.logoUrl ? (
-              <Image style={styles.agencyLogo} src={data.airline.logoUrl} />
-            ) : (
-              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                {data.airline.name}
-              </Text>
-            )}
-          </View>
-          <View style={{ alignItems: "center" }}>
-            {/* TODO fix styles */}
-            <Text style={styles.locatorLabel}>Localizador:</Text>
-            <View style={styles.locatorSection}>
-              <Text style={styles.locatorValue}>{data.locator}</Text>
+            {/* Left: Agency Logo - Explicitly left aligned */}
+            <View style={styles.agencySection}>
+                 <Image style={styles.agencyLogo} src="/viajando-com-sucesso-logo.png" /> 
             </View>
-          </View>
 
-          <View>
-            {/* TODO: Add airline logo */}
-            <Text
-              style={{ fontSize: 16, fontWeight: "bold", color: "#f05a22" }}
-            >
-              {data.airline.name}
-            </Text>
-          </View>
+            {/* Center: Locator */}
+            <View style={styles.locatorWrapper}>
+                <Text style={styles.locatorLabel}>{t.bookingReference}:</Text>
+                <View style={styles.locatorSection}>
+                     <Text style={styles.locatorValue}>{data.locator}</Text>
+                </View>
+            </View>
+
+            {/* Right: Airline Logo */}
+            <View style={styles.airlineSection}>
+                 {data.airline.logoUrl ? (
+                     <Image style={styles.airlineLogo} src={data.airline.logoUrl} />
+                 ) : (
+                     <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#f05a22' }}>{data.airline.name}</Text>
+                 )}
+            </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Informações da sua passagem</Text>
+        <Text style={styles.sectionTitle}>{t.passengerInfo}</Text>
 
         {/* Passengers */}
         <View style={styles.subHeader}>
-          {/* Icon placeholder */}
-          <Text style={{ fontSize: 10, fontWeight: "bold", marginBottom: 5 }}>
-            QUANTIDADE DE VIAJANTES: {data.passengers.length}
+          <UserIcon size={14} color="#333" style={{ marginRight: 5 }} />
+          <Text style={{ fontSize: 12, fontWeight: "bold", textTransform: 'uppercase' }}>
+            {t.travelers} {data.passengers.length}
           </Text>
         </View>
 
-        {/* TODO: fix styles */}
         {data.passengers.map((p, i) => (
           <View key={i} style={styles.passengerRow}>
-            {/* Icon placeholder */}
+             <View style={styles.passengerTypeIcon}>
+                {p.type === 'PET' ? <PawIcon size={14} color="#333" /> : 
+                 p.type === 'CHILD' ? <ChildIcon size={14} color="#333" /> : 
+                 <UserIcon size={14} color="#333" />}
+             </View>
             <Text style={styles.passengerName}>{p.name}</Text>
           </View>
         ))}
 
-        {/* Baggage */}
-        <View style={styles.baggageSection}>
-          <View style={styles.baggageItem}>
-            <Text
-              style={
-                data.baggage.personalItem > 0
-                  ? styles.baggageStatusIncluded
-                  : styles.baggageStatusExcluded
-              }
-            >
-              {data.baggage.personalItem > 0 ? "Incluído" : "Não Incluído"}
-            </Text>
-            {/* Icon placeholder */}
-            <Text style={{ fontSize: 10, fontWeight: "bold", marginTop: 5 }}>
-              ITEM PESSOAL {data.baggage.personalItem}
-            </Text>
-            <Text style={{ fontSize: 8, color: "#666", marginTop: 2 }}>
-              Bolsa ou mochila pequena.
-            </Text>
+        {/* Baggage Cards */}
+         <View style={styles.baggageSection}>
+          <View style={styles.baggageCard}>
+             {data.baggage.personalItem > 0 
+                ? <Text style={styles.baggageStatusPillIncluded}>{t.itemsIncluded}</Text>
+                : <Text style={styles.baggageStatusPillExcluded}>{t.itemsExcluded}</Text>
+             }
+            <BackpackIcon size={24} color={data.baggage.personalItem > 0 ? "#2ecc71" : "#000"} />
+            <Text style={styles.baggageTitle}>{t.personalItem} {data.baggage.personalItem}</Text>
+            <Text style={styles.baggageDesc}>{t.personalItemDesc}</Text>
           </View>
 
-          {/* Carry On */}
-          <View style={styles.baggageItem}>
-            <Text
-              style={
-                data.baggage.carryOn > 0
-                  ? styles.baggageStatusIncluded
-                  : styles.baggageStatusExcluded
-              }
-            >
-              {data.baggage.carryOn > 0 ? "Incluído" : "Não Incluído"}
-            </Text>
-            {/* Icon placeholder */}
-            <Text style={{ fontSize: 10, fontWeight: "bold", marginTop: 5 }}>
-              BAGAGEM DE MÃO {data.baggage.carryOn}
-            </Text>
-            <Text style={{ fontSize: 8, color: "#666", marginTop: 2 }}>
-              Bagagem de mão 10 kg.
-            </Text>
+          <View style={styles.baggageCard}>
+             {data.baggage.carryOn > 0 
+                ? <Text style={styles.baggageStatusPillIncluded}>{t.itemsIncluded}</Text>
+                : <Text style={styles.baggageStatusPillExcluded}>{t.itemsExcluded}</Text>
+             }
+            <BagIcon size={24} color={data.baggage.carryOn > 0 ? "#2ecc71" : "#000"} />
+            <Text style={styles.baggageTitle}>{t.carryOn} {data.baggage.carryOn}</Text>
+             <Text style={styles.baggageDesc}>{t.carryOnDesc}</Text>
           </View>
 
-          {/* Checked */}
-          <View style={styles.baggageItem}>
-            <Text
-              style={
-                data.baggage.checked > 0
-                  ? styles.baggageStatusIncluded
-                  : styles.baggageStatusExcluded
-              }
-            >
-              {data.baggage.checked > 0 ? "Incluído" : "Não Incluído"}
-            </Text>
-            {/* Icon placeholder */}
-            <Text style={{ fontSize: 10, fontWeight: "bold", marginTop: 5 }}>
-              BAGAGEM DESPACHADA {data.baggage.checked}
-            </Text>
-            <Text style={{ fontSize: 8, color: "#666", marginTop: 2 }}>
-              Bagagem despachada 23 kg.
-            </Text>
+          <View style={styles.baggageCard}>
+            {data.baggage.checked > 0 
+                ? <Text style={styles.baggageStatusPillIncluded}>{t.itemsIncluded}</Text>
+                : <Text style={styles.baggageStatusPillExcluded}>{t.itemsExcluded}</Text>
+             }
+             <BagIcon size={24} color={data.baggage.checked > 0 ? "#2ecc71" : "#000"} />
+            <Text style={styles.baggageTitle}>{t.checkedBaggage} {data.baggage.checked}</Text>
+             <Text style={styles.baggageDesc}>{t.checkedBaggageDesc}</Text>
           </View>
         </View>
 
         {/* Flights */}
-        <View
-          style={{ flexDirection: "row", alignItems: "center", marginTop: 10 }}
-        >
-          <Text style={styles.sectionTitle}>VOOS DE IDA</Text>
-          <Text style={{ fontSize: 10, color: "#666", marginLeft: 5 }}>
-            Início:
-          </Text>
-        </View>
+        {renderFlightSection(flightGroups.outbound, t.outboundFlight)}
+        {renderFlightSection(flightGroups.inbound, t.returnFlight)}
 
-        {data.flights.map((leg, i) => (
-          <View key={i} style={styles.flightLeg}>
-            <View style={{ width: 100 }}>
-              <Text style={{ fontSize: 10, fontWeight: "bold", color: "#333" }}>
-                {leg.flightNumber}
-              </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginTop: 2,
-                }}
-              >
-                <Text style={styles.flightDate}>
-                  {dayjs(leg.date).format("DD/MM/YYYY")}
-                </Text>
-                <Text style={styles.flightTimeBox}>{leg.origin.time}</Text>
-              </View>
-            </View>
-
-            <View style={styles.flightRoute}>
-              <View style={{ alignItems: "flex-end", width: "30%" }}>
-                <Text style={styles.cityName}>{leg.origin.city}</Text>
-                <Text style={styles.cityCode}>{leg.origin.code}</Text>
-              </View>
-
-              <View style={{ alignItems: "center", width: "20%" }}>
-                {/* Icon placeholder */}
-                <Text style={{ fontSize: 14, color: "#f05a22" }}>✈</Text>
-                <Text style={styles.duration}>{leg.duration}</Text>
-              </View>
-
-              <View style={{ alignItems: "flex-start", width: "30%" }}>
-                <Text style={styles.cityCode}>{leg.destination.code}</Text>
-                <Text style={styles.cityName}>{leg.destination.city}</Text>
-              </View>
-
-              <View style={{ alignItems: "flex-end", width: "20%" }}>
-                <Text style={styles.flightTimeBox}>{leg.destination.time}</Text>
-                <Text style={styles.flightDate}>
-                  {dayjs(leg.date).format("DD/MM/YYYY")}
-                </Text>
-              </View>
-            </View>
-          </View>
-        ))}
-
-        {/* Footer */}
+        {/* QR */}
         <View style={styles.footer}>
-          <Text style={{ fontSize: 14, fontWeight: "bold", marginBottom: 5 }}>
-            Encontre seu voo
-          </Text>
-          <Text style={{ fontSize: 10, color: "#666", marginBottom: 10 }}>
-            Utilize as informações acima ou leia QR Code ao lado
-          </Text>
-          {/* TODO: Add logic to generate the QR before rendering */}
-          {/* QRCode would go here. Since react-pdf doesn't support QR directly without a canvas or image, we might need a data url passed in. 
-                 For now, we will render an empty box or the text passed if it was an image url 
-             */}
-          {/* NOTE: To generate a real QR code in React-PDF, typically we generate it in the parent component as a Data URI and pass it as an Image. 
-                  For this MVP we will assume qrCodeText is a URL to an image or we just show a placeholder box if not an image.
-              */}
-          {data.airline.checkInUrl?.startsWith("data:image") ||
-          data.airline.checkInUrl?.startsWith("http") ? (
-            <Image style={styles.qrCode} src={data.airline.checkInUrl} />
-          ) : (
-            <View
-              style={{
-                width: 80,
-                height: 80,
-                backgroundColor: "#eee",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ fontSize: 8 }}>QR Code Placeholder</Text>
+             <Text style={{ fontSize: 16, fontWeight: 'normal', color: '#000', marginBottom: 5 }}>{t.findFlight}</Text>
+             <Text style={{ fontSize: 10, color: '#666' }}>{t.scanQr}</Text>
+            
+            <View style={styles.qrSection}>
+                {data.airline.checkInUrl?.startsWith("data:image") ||
+                data.airline.checkInUrl?.startsWith("http") ? (
+                    <Image style={styles.qrCode} src={data.airline.checkInUrl} />
+                ) : (
+                     // Placeholder QR
+                    <View style={{ padding: 10, backgroundColor: '#fff' }}>
+                         <Image style={{ width: 100, height: 100 }} src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Example" />
+                    </View>
+                )}
+                 <Text style={{ fontSize: 8, marginTop: 5 }}>{t.clickOrScan}</Text>
             </View>
-          )}
-          <Text style={{ fontSize: 8, marginTop: 5 }}>
-            Clique ou Leia o QR CODE
-          </Text>
-        </View>
 
-        <Text
-          style={{
-            fontSize: 10,
-            fontWeight: "bold",
-            marginTop: 20,
-            color: "#666",
-          }}
-        >
-          Informações importantes
-        </Text>
-        <Text style={styles.legalText}>
-          Penalidades, cancelamentos e alterações: A alteração no itinerário
-          original da viagem, antes ou após o seu início, somente é possível
-          dentro do prazo de validade da passagem sujeito aos ajustes de
-          tarifas, cobrança de taxa ou variações cambiais. O reembolso somente
-          será aceito se dentro do prazo de validade, respeitadas as regras de
-          tarifa promocional, cancelamento de voo e penalidades. Para mais
-          informações, inclusive referentes aos valores aplicáveis, consulte o
-          seu emissor.
-        </Text>
-
-        <Text
-          style={{
-            fontSize: 10,
-            fontWeight: "bold",
-            marginTop: 15,
-            color: "#666",
-          }}
-        >
-          Orientações para Embarque
-        </Text>
-        <View style={{ marginTop: 5 }}>
-          <Text style={{ fontSize: 7, color: "#666", marginBottom: 2 }}>
-            • Apresente-se em nosso check-in com 2 horas de antecedência em voos
-            nacionais, ou com 3 horas em voos internacionais.
-          </Text>
-          <Text style={{ fontSize: 7, color: "#666", marginBottom: 2 }}>
-            • Não se esqueça de levar seus documentos originais:
-          </Text>
-          <Text style={{ fontSize: 7, color: "#666", marginBottom: 2 }}>
-            • Carteira de Identidade para voos nacionais
-          </Text>
-          <Text style={{ fontSize: 7, color: "#666", marginBottom: 2 }}>
-            • Passaporte e os vistos necessários para entrada no pais de destino
-            para voos internacionais.
-          </Text>
-          <Text style={{ fontSize: 7, color: "#666", marginBottom: 2 }}>
-            • Verifique a necessidade de Vacinas para o destino de sua viagem.
-          </Text>
+           {/* Legal & Boarding could go here or below, keeping them for content completeness but maybe simpler layout */}
         </View>
-        <Text
-          style={{
-            fontSize: 10,
-            fontWeight: "bold",
-            marginTop: 15,
-            color: "#666",
-          }}
-        >
-          Contato
-        </Text>
-        <Text style={{ fontSize: 7, color: "#666", marginTop: 2 }}>
-          • {data.airline.contactPhone}
-        </Text>
+        <View style={styles.footer}>
+           <View style={{ alignSelf: 'stretch', marginTop: 20 }}>
+                 <Text style={{ fontWeight: 'bold', fontSize: 10, color: '#555' }}>{t.importantInfo}</Text>
+                 <Text style={styles.legalText}>{t.legalText}</Text>
+                 
+                 <Text style={{ fontWeight: 'bold', fontSize: 10, color: '#555', marginTop: 10 }}>{t.boardingInstructions}</Text>
+                 {t.boardingList.map((item, idx) => (
+                      <Text key={idx} style={{ fontSize: 7, color: '#666', marginTop: 2 }}>• {item}</Text>
+                  ))}
+                  
+                 <Text style={{ fontWeight: 'bold', fontSize: 10, color: '#555', marginTop: 10 }}>{t.contact}</Text>
+                 <Text style={{ fontSize: 8, color: '#666' }}>• {data.airline.contactPhone}</Text>
+           </View>
+        </View>
       </Page>
     </Document>
   );
 });
+
 
 FlightConfirmationPdf.displayName = "FlightConfirmationPdf";
 

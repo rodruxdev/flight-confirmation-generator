@@ -50,5 +50,6 @@ export interface ConfirmationData {
   passengers: Passenger[];
   baggage: BaggageConfig;
   flights: FlightLeg[];
+  returnFlights?: FlightLeg[];
   airline: AirlineInfo;
 }

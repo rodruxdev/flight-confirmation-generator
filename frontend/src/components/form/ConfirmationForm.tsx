@@ -1,5 +1,12 @@
 import React from "react";
-import type { ConfirmationData, Passenger, FlightLeg } from "../../types";
+import {
+  type ConfirmationData,
+  type Passenger,
+  type FlightLeg,
+  PassengerType,
+  Airlines,
+} from "../../types";
+import { AirlinesInfo, PassengerTypeLabels } from "../../constants";
 import { Plus, Trash2 } from "lucide-react";
 
 interface ConfirmationFormProps {
@@ -11,43 +18,61 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
   data,
   onChange,
 }) => {
-  const updateField = (field: keyof ConfirmationData, value: any) => {
+  const updateField = (field: keyof ConfirmationData, value: unknown) => {
     onChange({ ...data, [field]: value });
   };
 
-  const updateAgency = (field: keyof typeof data.agency, value: any) => {
-    onChange({ ...data, agency: { ...data.agency, [field]: value } });
+  const updateAirline = (field: keyof typeof data.airline, value: unknown) => {
+    onChange({ ...data, airline: { ...data.airline, [field]: value } });
   };
 
-  const updateBaggage = (field: keyof typeof data.baggage, value: any) => {
+  const handleAirlineChange = (airlineKey: Airlines) => {
+    const selectedAirline = AirlinesInfo[airlineKey];
+    onChange({
+      ...data,
+      airline: {
+        ...selectedAirline,
+        checkInUrl: data.airline.checkInUrl, // Preserve checkInUrl
+      },
+    });
+  };
+
+  const getCurrentAirlineKey = (): Airlines => {
+    const airlineName = data.airline.name;
+    if (airlineName === AirlinesInfo[Airlines.GOL].name) return Airlines.GOL;
+    if (airlineName === AirlinesInfo[Airlines.AZUL].name) return Airlines.AZUL;
+    if (airlineName === AirlinesInfo[Airlines.LATAM].name)
+      return Airlines.LATAM;
+    return Airlines.GOL; // Default to GOL
+  };
+
+  const updateBaggage = (field: keyof typeof data.baggage, value: unknown) => {
     onChange({ ...data, baggage: { ...data.baggage, [field]: Number(value) } });
   };
 
   // Passenger Handlers
   const addPassenger = () => {
     const newPassenger: Passenger = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: "NOVO PASSAGEIRO",
-      document: "",
+      name: "NOME",
+      type: PassengerType.ADULT,
     };
     updateField("passengers", [...data.passengers, newPassenger]);
   };
 
-  const removePassenger = (id: string) => {
-    updateField(
-      "passengers",
-      data.passengers.filter((p) => p.id !== id)
-    );
+  const removePassenger = (id: number) => {
+    const updatedPassengers = [...data.passengers];
+    updatedPassengers.splice(id, 1);
+    updateField("passengers", updatedPassengers);
   };
 
   const updatePassenger = (
-    id: string,
+    id: number,
     field: keyof Passenger,
     value: string
   ) => {
-    const updatedPassengers = data.passengers.map((p) =>
-      p.id === id ? { ...p, [field]: value } : p
-    );
+    const passengerToUpdate = { ...data.passengers[id], [field]: value };
+    const updatedPassengers = [...data.passengers];
+    updatedPassengers[id] = passengerToUpdate;
     updateField("passengers", updatedPassengers);
   };
 
@@ -55,7 +80,6 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
   const addFlight = () => {
     // Fix the messy cast by providing correct initial structure matching types
     const cleanFlight: FlightLeg = {
-      id: Math.random().toString(36).substr(2, 9),
       flightNumber: "G3 1234",
       date: new Date().toISOString().split("T")[0],
       duration: "1h00m",
@@ -66,90 +90,113 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
     updateField("flights", [...data.flights, cleanFlight]);
   };
 
-  const removeFlight = (id: string) => {
-    updateField(
-      "flights",
-      data.flights.filter((f) => f.id !== id)
-    );
+  const removeFlight = (id: number) => {
+    const updatedFlights = [...data.flights];
+    updatedFlights.splice(id, 1);
+    updateField("flights", updatedFlights);
   };
 
-  const updateFlight = (id: string, field: keyof FlightLeg, value: any) => {
+  const updateFlight = (id: number, field: keyof FlightLeg, value: unknown) => {
     // Shallow update for top level fields
-    const updatedFlights = data.flights.map((f) =>
-      f.id === id ? { ...f, [field]: value } : f
-    );
+    const flightToUpdate = { ...data.flights[id], [field]: value };
+    const updatedFlights = [...data.flights];
+    updatedFlights[id] = flightToUpdate;
     updateField("flights", updatedFlights);
   };
 
   const updateFlightLocation = (
-    id: string,
+    id: number,
     type: "origin" | "destination",
     subField: "city" | "code" | "time",
     value: string
   ) => {
-    const updatedFlights = data.flights.map((f) => {
-      if (f.id === id) {
-        return {
-          ...f,
-          [type]: {
-            ...f[type],
-            [subField]: value,
-          },
-        };
-      }
-      return f;
-    });
+    const flightToUpdate = {
+      ...data.flights[id],
+      [type]: { ...data.flights[id][type], [subField]: value },
+    };
+    const updatedFlights = [...data.flights];
+    updatedFlights[id] = flightToUpdate;
     updateField("flights", updatedFlights);
+  };
+
+  // Return Flight Handlers
+  const addReturnFlight = () => {
+    const cleanFlight: FlightLeg = {
+      flightNumber: "G3 5678",
+      date: new Date().toISOString().split("T")[0],
+      duration: "1h30m",
+      origin: { city: "Cidade Volta", code: "DST", time: "18:00" },
+      destination: { city: "Cidade Origem", code: "ORG", time: "19:30" },
+    };
+
+    const currentReturnFlights = data.returnFlights || [];
+    updateField("returnFlights", [...currentReturnFlights, cleanFlight]);
+  };
+
+  const removeReturnFlight = (id: number) => {
+    if (!data.returnFlights) return;
+    const updatedFlights = [...data.returnFlights];
+    updatedFlights.splice(id, 1);
+    updateField("returnFlights", updatedFlights);
+  };
+
+  const updateReturnFlight = (id: number, field: keyof FlightLeg, value: unknown) => {
+    if (!data.returnFlights) return;
+    const flightToUpdate = { ...data.returnFlights[id], [field]: value };
+    const updatedFlights = [...data.returnFlights];
+    updatedFlights[id] = flightToUpdate;
+    updateField("returnFlights", updatedFlights);
+  };
+
+  const updateReturnFlightLocation = (
+    id: number,
+    type: "origin" | "destination",
+    subField: "city" | "code" | "time",
+    value: string
+  ) => {
+    if (!data.returnFlights) return;
+    const flightToUpdate = {
+      ...data.returnFlights[id],
+      [type]: { ...data.returnFlights[id][type], [subField]: value },
+    };
+    const updatedFlights = [...data.returnFlights];
+    updatedFlights[id] = flightToUpdate;
+    updateField("returnFlights", updatedFlights);
   };
 
   return (
     <div className="form-container">
-      <h2 style={{ marginBottom: "1rem" }}>Configuração</h2>
-
       <div className="form-section">
-        <h3>Agência & Voo</h3>
+        <h3>Companhia Aérea & Voo</h3>
         <div className="form-group">
-          <label>Nome da Agência</label>
+          <label>Companhia Aérea</label>
+          <select
+            value={getCurrentAirlineKey()}
+            onChange={(e) => handleAirlineChange(e.target.value as Airlines)}
+          >
+            <option value={Airlines.GOL}>{AirlinesInfo.GOL.name}</option>
+            <option value={Airlines.AZUL}>{AirlinesInfo.Azul.name}</option>
+            <option value={Airlines.LATAM}>{AirlinesInfo.Latam.name}</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Localizador</label>
           <input
             type="text"
-            value={data.agency.name}
-            onChange={(e) => updateAgency("name", e.target.value)}
+            value={data.locator}
+            onChange={(e) => updateField("locator", e.target.value)}
           />
         </div>
         <div className="form-group">
-          <label>Telefone Contato</label>
-          <input
-            type="text"
-            value={data.agency.contactPhone}
-            onChange={(e) => updateAgency("contactPhone", e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label>Logo URL (Agência)</label>
-          <input
-            type="text"
-            value={data.agency.logoUrl || ""}
-            onChange={(e) => updateAgency("logoUrl", e.target.value)}
-            placeholder="https://..."
-          />
-        </div>
-        <div className="row">
-          <div className="form-group">
-            <label>Companhia Aérea</label>
-            <input
-              type="text"
-              value={data.airline}
-              onChange={(e) => updateField("airline", e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label>Localizador</label>
-            <input
-              type="text"
-              value={data.locator}
-              onChange={(e) => updateField("locator", e.target.value)}
-            />
-          </div>
+          <label>Idioma do PDF</label>
+          <select
+            value={data.language}
+            onChange={(e) => updateField("language", e.target.value)}
+          >
+            <option value="pt">Português</option>
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
         </div>
       </div>
 
@@ -160,32 +207,45 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
             <Plus size={16} />
           </button>
         </div>
-        {data.passengers.map((p) => (
-          <div key={p.id} className="card-item">
+        {data.passengers.map((p, index) => (
+          <div key={`passenger-${index}`} className="card-item">
+            {/* Mobile header with delete button */}
+            <div className="card-header-mobile">
+              <span className="card-title-mobile">Passageiro {index + 1}</span>
+              <button
+                className="btn-delete"
+                onClick={() => removePassenger(index)}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
             <div className="row">
               <input
                 type="text"
                 placeholder="Nome Completo"
                 value={p.name}
-                onChange={(e) => updatePassenger(p.id, "name", e.target.value)}
-                style={{ flex: 2 }}
+                onChange={(e) => updatePassenger(index, "name", e.target.value)}
               />
-              <button
-                className="btn-delete"
-                onClick={() => removePassenger(p.id)}
-              >
-                <Trash2 size={16} />
-              </button>
             </div>
-            <input
-              type="text"
-              placeholder="Documento / CPF"
-              value={p.document}
-              onChange={(e) =>
-                updatePassenger(p.id, "document", e.target.value)
-              }
-              style={{ marginTop: "0.5rem" }}
-            />
+            <div className="form-group" style={{ marginTop: "0.5rem" }}>
+              <label>Tipo de Passageiro</label>
+              <select
+                value={p.type}
+                onChange={(e) =>
+                  updatePassenger(
+                    index,
+                    "type",
+                    e.target.value as PassengerType
+                  )
+                }
+              >
+                {Object.values(PassengerType).map((type) => (
+                  <option key={type} value={type}>
+                    {PassengerTypeLabels[type]}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         ))}
       </div>
@@ -199,6 +259,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
               type="number"
               value={data.baggage.personalItem}
               onChange={(e) => updateBaggage("personalItem", e.target.value)}
+              min={0}
             />
           </div>
           <div className="form-group">
@@ -207,6 +268,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
               type="number"
               value={data.baggage.carryOn}
               onChange={(e) => updateBaggage("carryOn", e.target.value)}
+              min={0}
             />
           </div>
           <div className="form-group">
@@ -215,6 +277,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
               type="number"
               value={data.baggage.checked}
               onChange={(e) => updateBaggage("checked", e.target.value)}
+              min={0}
             />
           </div>
         </div>
@@ -227,14 +290,18 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
             <Plus size={16} />
           </button>
         </div>
-        {data.flights.map((f) => (
-          <div key={f.id} className="card-item">
-            <div className="row header-row">
-              <button className="btn-delete" onClick={() => removeFlight(f.id)}>
+        {data.flights.map((f, index) => (
+          <div key={`flight-${index}`} className="card-item">
+            {/* Mobile header with delete button */}
+            <div className="card-header-mobile">
+              <span className="card-title-mobile">Voo {index + 1}</span>
+              <button
+                className="btn-delete"
+                onClick={() => removeFlight(index)}
+              >
                 <Trash2 size={16} />
               </button>
             </div>
-
             <div className="row">
               <div className="form-group">
                 <label>Número</label>
@@ -242,7 +309,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   type="text"
                   value={f.flightNumber}
                   onChange={(e) =>
-                    updateFlight(f.id, "flightNumber", e.target.value)
+                    updateFlight(index, "flightNumber", e.target.value)
                   }
                 />
               </div>
@@ -251,7 +318,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                 <input
                   type="date"
                   value={f.date}
-                  onChange={(e) => updateFlight(f.id, "date", e.target.value)}
+                  onChange={(e) => updateFlight(index, "date", e.target.value)}
                 />
               </div>
             </div>
@@ -265,7 +332,12 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   placeholder="Cidade"
                   value={f.origin.city}
                   onChange={(e) =>
-                    updateFlightLocation(f.id, "origin", "city", e.target.value)
+                    updateFlightLocation(
+                      index,
+                      "origin",
+                      "city",
+                      e.target.value
+                    )
                   }
                   style={{ flex: 2 }}
                 />
@@ -274,7 +346,12 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   placeholder="IATA"
                   value={f.origin.code}
                   onChange={(e) =>
-                    updateFlightLocation(f.id, "origin", "code", e.target.value)
+                    updateFlightLocation(
+                      index,
+                      "origin",
+                      "code",
+                      e.target.value
+                    )
                   }
                   maxLength={3}
                   style={{ flex: 1 }}
@@ -283,7 +360,12 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   type="time"
                   value={f.origin.time}
                   onChange={(e) =>
-                    updateFlightLocation(f.id, "origin", "time", e.target.value)
+                    updateFlightLocation(
+                      index,
+                      "origin",
+                      "time",
+                      e.target.value
+                    )
                   }
                   style={{ flex: 1 }}
                 />
@@ -302,7 +384,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   value={f.destination.city}
                   onChange={(e) =>
                     updateFlightLocation(
-                      f.id,
+                      index,
                       "destination",
                       "city",
                       e.target.value
@@ -316,7 +398,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   value={f.destination.code}
                   onChange={(e) =>
                     updateFlightLocation(
-                      f.id,
+                      index,
                       "destination",
                       "code",
                       e.target.value
@@ -330,7 +412,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   value={f.destination.time}
                   onChange={(e) =>
                     updateFlightLocation(
-                      f.id,
+                      index,
                       "destination",
                       "time",
                       e.target.value
@@ -340,27 +422,178 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                 />
               </div>
             </div>
+          </div>
+        ))}
+      </div>
 
-            <div className="form-group" style={{ marginTop: "0.5rem" }}>
-              <label>Duração</label>
-              <input
-                type="text"
-                value={f.duration}
-                onChange={(e) => updateFlight(f.id, "duration", e.target.value)}
-              />
+      <div className="form-section">
+        <div className="section-header">
+          <h3>Voos de Volta (Opcional)</h3>
+          {(!data.returnFlights || data.returnFlights.length === 0) ? (
+            <button className="btn-primary" onClick={addReturnFlight} style={{ fontSize: '0.8rem', padding: '4px 8px' }}>
+              Adicionar Volta
+            </button>
+          ) : (
+             <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className="btn-delete"
+                  title="Remover toda a volta"
+                  onClick={() => onChange({ ...data, returnFlights: [] })}
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: '#e74c3c' }}
+                >
+                  <Trash2 size={14} /> Remover Seção
+                </button>
+                <button className="btn-icon" onClick={addReturnFlight}>
+                  <Plus size={16} />
+                </button>
+             </div>
+          )}
+        </div>
+        
+        {data.returnFlights && data.returnFlights.map((f, index) => (
+          <div key={`return-flight-${index}`} className="card-item">
+            {/* Mobile header with delete button */}
+            <div className="card-header-mobile">
+              <span className="card-title-mobile">Voo de Volta {index + 1}</span>
+              <button
+                className="btn-delete"
+                onClick={() => removeReturnFlight(index)}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+            <div className="row">
+              <div className="form-group">
+                <label>Número</label>
+                <input
+                  type="text"
+                  value={f.flightNumber}
+                  onChange={(e) =>
+                    updateReturnFlight(index, "flightNumber", e.target.value)
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <label>Data</label>
+                <input
+                  type="date"
+                  value={f.date}
+                  onChange={(e) => updateReturnFlight(index, "date", e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Origin */}
+            <div className="location-group">
+              <span className="label-small">ORIGEM ({f.origin.code})</span>
+              <div className="row">
+                <input
+                  type="text"
+                  placeholder="Cidade"
+                  value={f.origin.city}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "origin",
+                      "city",
+                      e.target.value
+                    )
+                  }
+                  style={{ flex: 2 }}
+                />
+                <input
+                  type="text"
+                  placeholder="IATA"
+                  value={f.origin.code}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "origin",
+                      "code",
+                      e.target.value
+                    )
+                  }
+                  maxLength={3}
+                  style={{ flex: 1 }}
+                />
+                <input
+                  type="time"
+                  value={f.origin.time}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "origin",
+                      "time",
+                      e.target.value
+                    )
+                  }
+                  style={{ flex: 1 }}
+                />
+              </div>
+            </div>
+
+            {/* Destination */}
+            <div className="location-group">
+              <span className="label-small">
+                DESTINO ({f.destination.code})
+              </span>
+              <div className="row">
+                <input
+                  type="text"
+                  placeholder="Cidade"
+                  value={f.destination.city}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "destination",
+                      "city",
+                      e.target.value
+                    )
+                  }
+                  style={{ flex: 2 }}
+                />
+                <input
+                  type="text"
+                  placeholder="IATA"
+                  value={f.destination.code}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "destination",
+                      "code",
+                      e.target.value
+                    )
+                  }
+                  maxLength={3}
+                  style={{ flex: 1 }}
+                />
+                <input
+                  type="time"
+                  value={f.destination.time}
+                  onChange={(e) =>
+                    updateReturnFlightLocation(
+                      index,
+                      "destination",
+                      "time",
+                      e.target.value
+                    )
+                  }
+                  style={{ flex: 1 }}
+                />
+              </div>
             </div>
           </div>
         ))}
       </div>
 
       <div className="form-section">
-        <h3>Rodapé</h3>
+        <h3>QR Code</h3>
         <div className="form-group">
-          <label>QR Code Imagem/URL</label>
+          <label>QR Code URL</label>
           <input
             type="text"
-            value={data.qrCodeText}
-            onChange={(e) => updateField("qrCodeText", e.target.value)}
+            value={data.airline.checkInUrl}
+            onChange={(e) => updateAirline("checkInUrl", e.target.value)}
             placeholder="URL do QR Code"
           />
         </div>

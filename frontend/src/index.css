@@ -38,6 +38,15 @@ a {
   flex-direction: column;
 }
 
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #c2c2c2;
+}
+
 .preview-area {
   flex: 1;
   display: flex;
@@ -69,6 +78,10 @@ a {
   margin-bottom: 15px;
   border-bottom: 2px solid #c2c2c2;
   padding-bottom: 15px;
+}
+
+.form-section:last-child {
+  border-bottom: none;
 }
 
 .form-section h3 {
@@ -103,16 +116,19 @@ a {
 input[type="text"],
 input[type="number"],
 input[type="date"],
-input[type="time"] {
+input[type="time"],
+select {
   width: 100%;
   padding: 8px;
   border: 2px solid #8f8f8f;
   border-radius: 4px;
   font-size: 16px;
   font-family: inherit;
+  background-color: #fff;
 }
 
-input:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: #007bff;
 }
@@ -120,6 +136,10 @@ input:focus {
 .row {
   display: flex;
   gap: 10px;
+}
+
+.row-space-between {
+  justify-content: space-between;
 }
 
 .card-item {
@@ -136,12 +156,6 @@ input:focus {
   font-size: 10px;
   padding: 2px 6px;
   border-radius: 4px;
-}
-
-.header-row {
-  justify-content: flex-end;
-  align-items: center;
-  margin-bottom: 5px;
 }
 
 .location-group {
@@ -203,4 +217,153 @@ button {
   border: none;
   color: #e74c3c;
   padding: 4px;
+}
+
+.btn-apply {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-apply:hover {
+  background-color: #218838;
+}
+
+/* Card header - visible on both desktop and mobile */
+.card-header-mobile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.card-title-mobile {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
+/* Floating apply button - hidden by default (desktop) */
+.btn-apply-floating {
+  display: none;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 100%;
+    order: 1;
+    padding: 20px;
+    padding-bottom: 80px; /* Extra padding for floating button */
+    overflow-y: visible;
+    position: relative;
+  }
+
+  .sidebar-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .sidebar-header h2 {
+    text-align: center;
+  }
+
+  /* Hide header apply button on mobile */
+  .btn-apply-header {
+    display: none;
+  }
+
+  /* Show floating apply button on mobile */
+  .btn-apply-floating {
+    display: flex;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+  }
+
+  .btn-apply-floating:hover {
+    background-color: #218838;
+    transform: scale(1.1);
+  }
+
+  .btn-apply-floating:active {
+    transform: scale(0.95);
+  }
+
+  .preview-area {
+    width: 100%;
+    order: 2;
+    min-height: 600px;
+    height: auto;
+  }
+
+  .preview-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .preview-header h2 {
+    text-align: center;
+  }
+
+  .preview-header .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pdf-wrapper {
+    height: 600px;
+    min-height: 600px;
+  }
+
+  .pdf-viewer {
+    height: 600px;
+  }
+
+
+  /* Form adjustments for mobile */
+  .row {
+    flex-direction: column;
+  }
+
+  .row-space-between {
+    flex-direction: row;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
 }

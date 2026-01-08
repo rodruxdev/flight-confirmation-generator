@@ -58,12 +58,16 @@ function App() {
       <div className="sidebar">
         <div className="sidebar-header">
           <h2 style={{ marginBottom: "1rem" }}>Configuração</h2>
-          <button className="btn-apply" onClick={handleApply}>
+          <button className="btn-apply btn-apply-header" onClick={handleApply}>
             <Check size={16} style={{ marginRight: 5 }} />
             Aplicar Alterações
           </button>
         </div>
         <ConfirmationForm data={formData} onChange={setFormData} />
+        {/* Floating button for mobile */}
+        <button className="btn-apply-floating" onClick={handleApply}>
+          <Check size={20} />
+        </button>
       </div>
       <PdfPreviewArea pdfData={pdfData} />
     </div>

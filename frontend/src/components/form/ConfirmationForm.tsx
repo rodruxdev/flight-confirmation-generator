@@ -209,20 +209,23 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
         </div>
         {data.passengers.map((p, index) => (
           <div key={`passenger-${index}`} className="card-item">
-            <div className="row">
-              <input
-                type="text"
-                placeholder="Nome Completo"
-                value={p.name}
-                onChange={(e) => updatePassenger(index, "name", e.target.value)}
-                style={{ flex: 2 }}
-              />
+            {/* Mobile header with delete button */}
+            <div className="card-header-mobile">
+              <span className="card-title-mobile">Passageiro {index + 1}</span>
               <button
                 className="btn-delete"
                 onClick={() => removePassenger(index)}
               >
                 <Trash2 size={16} />
               </button>
+            </div>
+            <div className="row">
+              <input
+                type="text"
+                placeholder="Nome Completo"
+                value={p.name}
+                onChange={(e) => updatePassenger(index, "name", e.target.value)}
+              />
             </div>
             <div className="form-group" style={{ marginTop: "0.5rem" }}>
               <label>Tipo de Passageiro</label>
@@ -289,8 +292,17 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
         </div>
         {data.flights.map((f, index) => (
           <div key={`flight-${index}`} className="card-item">
-            <div className="row row-space-between">
-              <div className="row">
+            {/* Mobile header with delete button */}
+            <div className="card-header-mobile">
+              <span className="card-title-mobile">Voo {index + 1}</span>
+              <button
+                className="btn-delete"
+                onClick={() => removeFlight(index)}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+            <div className="row">
               <div className="form-group">
                 <label>Número</label>
                 <input
@@ -309,13 +321,6 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   onChange={(e) => updateFlight(index, "date", e.target.value)}
                 />
               </div>
-              </div>
-              <button
-                className="btn-delete"
-                onClick={() => removeFlight(index)}
-              >
-                <Trash2 size={16} />
-              </button>
             </div>
 
             {/* Origin */}
@@ -447,8 +452,17 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
         
         {data.returnFlights && data.returnFlights.map((f, index) => (
           <div key={`return-flight-${index}`} className="card-item">
-            <div className="row row-space-between">
-              <div className="row">
+            {/* Mobile header with delete button */}
+            <div className="card-header-mobile">
+              <span className="card-title-mobile">Voo de Volta {index + 1}</span>
+              <button
+                className="btn-delete"
+                onClick={() => removeReturnFlight(index)}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+            <div className="row">
               <div className="form-group">
                 <label>Número</label>
                 <input
@@ -467,13 +481,6 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
                   onChange={(e) => updateReturnFlight(index, "date", e.target.value)}
                 />
               </div>
-              </div>
-              <button
-                className="btn-delete"
-                onClick={() => removeReturnFlight(index)}
-              >
-                <Trash2 size={16} />
-              </button>
             </div>
 
             {/* Origin */}

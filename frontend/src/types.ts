@@ -1,6 +1,7 @@
 export enum PassengerType {
   ADULT = "ADULT",
   CHILD = "CHILD",
+  BABY = "BABY",
   PET = "PET",
 }
 

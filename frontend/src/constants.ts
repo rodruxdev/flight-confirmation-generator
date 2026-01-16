@@ -22,5 +22,6 @@ export const AirlinesInfo: Record<Airlines, AirlineInfo> = {
 export const PassengerTypeLabels: Record<PassengerType, string> = {
   [PassengerType.ADULT]: "Adulto",
   [PassengerType.CHILD]: "Criança",
+  [PassengerType.BABY]: "Bebe",
   [PassengerType.PET]: "Pet",
 };

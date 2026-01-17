@@ -26,8 +26,8 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   agencyLogo: {
-    width: 150,
-    height: 120,
+    width: 120,
+    height: 90,
     objectFit: "cover",
   },
   locatorWrapper: {
@@ -62,7 +62,7 @@ export const styles = StyleSheet.create({
   },
   airlineLogo: {
     width: 120,
-    height: 80,
+    height: 90,
     objectFit: "cover",
   },
   sectionTitle: {
@@ -207,7 +207,6 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    justifyContent: "space-between",
   },
   flightNumber: {
     fontSize: 9,
@@ -217,7 +216,6 @@ export const styles = StyleSheet.create({
   flightDate: {
     fontSize: 9,
     color: "#666",
-    marginRight: 10,
   },
   timeTag: {
     backgroundColor: "#cc3300", // Deep orange/rust
@@ -227,6 +225,7 @@ export const styles = StyleSheet.create({
     borderRadius: 4,
     fontSize: 10,
     fontWeight: "bold",
+    marginHorizontal: 15,
   },
   cityText: {
     fontSize: 14,

@@ -22,6 +22,10 @@ interface FlightConfirmationPdfProps {
   locale?: Language;
 }
 
+// TODO divide this in different components
+// TODO fix font and styles related to fonts
+// TODO add QR logic
+// TODO add new text and style for new text
 const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
   ({ data, locale = "pt" }) => {
     const t = translations[locale] || translations.pt;
@@ -51,7 +55,6 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
           </View>
 
           {/* Flight Rows */}
-          {/* TODO fix table look with fixed width */}
           {flights.map((leg, i) => (
             <View key={i} style={styles.flightLeg}>
               <View style={styles.flightInfoRow}>
@@ -66,7 +69,8 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
-                      marginLeft: 15,
+                      justifyContent: "flex-end",
+                      width: 80,
                     }}
                   >
                     <Text style={{ fontSize: 9, color: "#333", maxWidth: 50 }}>
@@ -84,7 +88,11 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
                   </View>
 
                   <View style={styles.durationContainer}>
-                    <Text style={{ fontSize: 8, color: "#ccc" }}>.....</Text>
+                    <Text
+                      style={{ fontSize: 10, color: "#bbb", marginRight: 3 }}
+                    >
+                      ••••
+                    </Text>
                     <PlaneIcon
                       size={12}
                       color="#f05a22"
@@ -96,10 +104,21 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
                     <Text style={{ fontSize: 9, fontWeight: "bold" }}>
                       {leg.duration}
                     </Text>
-                    <Text style={{ fontSize: 8, color: "#ccc" }}>.....</Text>
+                    <Text
+                      style={{ fontSize: 10, color: "#bbb", marginLeft: 3 }}
+                    >
+                      ••••
+                    </Text>
                   </View>
 
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "flex-start",
+                      width: 80,
+                    }}
+                  >
                     <Text
                       style={{
                         fontSize: 16,
@@ -117,7 +136,7 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
 
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Text style={styles.timeTag}>{leg.destination.time}</Text>
-                  <Text style={{ ...styles.flightDate, marginLeft: 10 }}>
+                  <Text style={styles.flightDate}>
                     {dayjs(leg.date).format("DD/MM/YYYY")}
                   </Text>
                 </View>
@@ -325,8 +344,8 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
               <Text style={{ fontSize: 8, marginTop: 5 }}>{t.clickOrScan}</Text>
             </View>
           </View>
-
-          {/* TODO move this to a new page and uptade with proper content */}
+        </Page>
+        <Page size="A4" style={styles.page}>
           <View style={styles.footer}>
             <View style={{ alignSelf: "stretch", marginTop: 20 }}>
               <Text style={{ fontWeight: "bold", fontSize: 10, color: "#555" }}>

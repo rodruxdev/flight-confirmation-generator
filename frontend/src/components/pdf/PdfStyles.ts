@@ -1,11 +1,18 @@
 import { StyleSheet, Font } from "@react-pdf/renderer";
 
+// Register Open Sans font family with all variants
 Font.register({
   family: "Open Sans",
-  src: "https://fonts.gstatic.com/s/opensans/v17/mem8YaGs126MiZpBA-UFVZ0e.ttf",
+  fonts: [
+    { src: "/fonts/OpenSans-Regular.ttf" }, // font-style: normal, font-weight: normal
+    { src: "/fonts/OpenSans-Bold.ttf", fontWeight: "bold" },
+    { src: "/fonts/OpenSans-Italic.ttf", fontStyle: "italic" },
+    { src: "/fonts/OpenSans-BoldItalic.ttf", fontStyle: "italic", fontWeight: "bold" },
+  ],
 });
 
 export const styles = StyleSheet.create({
+  // Base page
   page: {
     padding: 30,
     fontFamily: "Open Sans",
@@ -13,6 +20,8 @@ export const styles = StyleSheet.create({
     color: "#333",
     backgroundColor: "#fff",
   },
+
+  // Header section
   header: {
     flexDirection: "row",
     justifyContent: "center",
@@ -65,6 +74,13 @@ export const styles = StyleSheet.create({
     height: 90,
     objectFit: "cover",
   },
+  airlineNameFallback: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#f05a22",
+  },
+
+  // Section titles
   sectionTitle: {
     fontSize: 18,
     fontWeight: "normal",
@@ -77,6 +93,8 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 5,
   },
+
+  // Number badges
   numberContainer: {
     marginLeft: 2,
     paddingVertical: 1,
@@ -84,12 +102,17 @@ export const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 2,
   },
-  passengerLabel: {
+  textBold12: {
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  textBold12Upper: {
     fontSize: 12,
     fontWeight: "bold",
     textTransform: "uppercase",
-    marginLeft: 5,
   },
+
+  // Passenger section
   passengerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -105,11 +128,13 @@ export const styles = StyleSheet.create({
     flex: 1,
     textTransform: "uppercase",
   },
-  passengerDoc: {
-    fontSize: 11,
-    color: "#333",
-    fontWeight: "bold",
+  passengerTypeIcon: {
+    marginRight: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 20,
   },
+
   // Baggage Cards
   baggageSection: {
     flexDirection: "row",
@@ -141,8 +166,8 @@ export const styles = StyleSheet.create({
     marginBottom: 5,
   },
   baggageStatusPillExcluded: {
-    backgroundColor: "#fff5f5", // light red
-    color: "#e53e3e", // red
+    backgroundColor: "#fff5f5",
+    color: "#e53e3e",
     fontSize: 8,
     fontWeight: "bold",
     paddingHorizontal: 8,
@@ -183,6 +208,9 @@ export const styles = StyleSheet.create({
   },
 
   // Flight Section
+  flightSectionWrapper: {
+    marginBottom: 10,
+  },
   flightSectionTitle: {
     flexDirection: "row",
     alignItems: "center",
@@ -194,6 +222,11 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     textTransform: "uppercase",
     color: "#000",
+  },
+  flightStartLabel: {
+    fontSize: 10,
+    color: "#666",
+    marginLeft: 5,
   },
   flightLeg: {
     flexDirection: "row",
@@ -208,6 +241,10 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
+  flightRowCenter: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   flightNumber: {
     fontSize: 9,
     color: "#666",
@@ -218,7 +255,7 @@ export const styles = StyleSheet.create({
     color: "#666",
   },
   timeTag: {
-    backgroundColor: "#cc3300", // Deep orange/rust
+    backgroundColor: "#cc3300",
     color: "#fff",
     paddingHorizontal: 4,
     paddingVertical: 2,
@@ -227,29 +264,79 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     marginHorizontal: 15,
   },
-  cityText: {
-    fontSize: 14,
-    fontWeight: "normal",
-    color: "#000",
+  originContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    width: 80,
   },
-  cityLabel: {
+  destinationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    width: 80,
+  },
+  cityName: {
     fontSize: 9,
-    color: "#666",
-    marginLeft: 4,
+    color: "#333",
+    maxWidth: 50,
+  },
+  airportCode: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  airportCodeOrigin: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 5,
+  },
+  airportCodeDestination: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginRight: 5,
   },
   durationContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: 10,
   },
+  durationDots: {
+    fontSize: 10,
+    color: "#bbb",
+  },
+  durationDotsLeft: {
+    fontSize: 10,
+    color: "#bbb",
+    marginRight: 3,
+  },
+  durationDotsRight: {
+    fontSize: 10,
+    color: "#bbb",
+    marginLeft: 3,
+  },
+  durationTime: {
+    fontSize: 9,
+    fontWeight: "bold",
+  },
+  planeIconWrapper: {
+    marginHorizontal: 2,
+    transform: "rotate(90deg)",
+  },
+
+  // Footer & QR
   footer: {
     marginTop: 30,
     alignItems: "center",
   },
-  footerTitle: {
-    fontSize: 14,
+  findFlightTitle: {
+    fontSize: 16,
+    fontWeight: "normal",
+    color: "#000",
     marginBottom: 5,
-    textAlign: "center",
+  },
+  scanQrText: {
+    fontSize: 10,
+    color: "#666",
   },
   qrSection: {
     alignItems: "center",
@@ -261,17 +348,69 @@ export const styles = StyleSheet.create({
     marginBottom: 5,
     objectFit: "cover",
   },
-  legalText: {
-    fontSize: 6,
-    color: "#999",
+  clickOrScanText: {
+    fontSize: 8,
     marginTop: 5,
-    lineHeight: 1.3,
-    textAlign: "justify",
   },
-  passengerTypeIcon: {
-    marginRight: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    width: 20,
+
+  // Additional Info Page Styles
+  additionalPageTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  additionalSectionWrapper: {
+    marginBottom: 6,
+  },
+  additionalSectionTitle: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginTop: 10,
+    marginBottom: 4,
+    color: "#333",
+  },
+  additionalAirlineContact: {
+    marginTop: 2,
+  },
+  additionalItemWrapper: {
+    marginBottom: 2,
+  },
+  additionalItemRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  additionalSubItemRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginLeft: 10,
+  },
+  additionalBullet: {
+    width: 10,
+    fontSize: 8,
+  },
+  additionalContentWrapper: {
+    flex: 1,
+  },
+  additionalItemText: {
+    fontSize: 8,
+    color: "#444",
+    marginBottom: 2,
+    lineHeight: 1.4,
+  },
+  additionalSubItemText: {
+    fontSize: 8,
+    color: "#555",
+    marginLeft: 10,
+    marginBottom: 2,
+    lineHeight: 1.4,
+  },
+  additionalBoldText: {
+    fontWeight: "bold",
+    color: "#000",
+  },
+
+  // Common icon styles
+  iconMarginRight: {
+    marginRight: 5,
   },
 });

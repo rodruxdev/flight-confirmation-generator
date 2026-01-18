@@ -1,22 +1,20 @@
 import React, { memo, useMemo } from "react";
 import { Document, Page, Text, View, Image, Link } from "@react-pdf/renderer";
-import type { ConfirmationData, FlightLeg, Language } from "../../types";
+import type { ConfirmationData, Language } from "../../types";
 import { styles } from "./PdfStyles";
-import dayjs from "dayjs";
 import { translations } from "./TranslationConstants";
 import {
   UserIcon,
   ChildIcon,
   PawIcon,
   BagIcon,
-  PlaneIcon,
   BackpackIcon,
   UserCheckIcon,
   BabyCarriageIcon,
   SuitcaseRollingIcon,
-  AirplaneTiltFillIcon,
 } from "./PdfIcons";
 import AdditionalInfoPage from "./AdditionalInfoPage";
+import FlightSection from "./FlightSection";
 
 interface FlightConfirmationPdfProps {
   data: ConfirmationData;
@@ -24,9 +22,6 @@ interface FlightConfirmationPdfProps {
   locale?: Language;
 }
 
-// TODO divide this in different components
-// TODO fix font and styles related to fonts
-// TODO add new text and style for new text
 const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
   ({ data, qrCodeImageString = "", locale = "pt" }) => {
     const t = translations[locale] || translations.pt;
@@ -38,82 +33,7 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
       return { outbound: data.flights, inbound: [] };
     }, [data.flights, data.returnFlights]);
 
-    const renderFlightSection = (flights: FlightLeg[], title: string) => {
-      if (!flights.length) return null;
-      return (
-        <View style={styles.flightSectionWrapper}>
-          {/* Title Row */}
-          <View style={styles.flightSectionTitle}>
-            <AirplaneTiltFillIcon
-              size={14}
-              color="#f05a22"
-              style={styles.iconMarginRight}
-            />
-            <Text style={styles.flightTitleText}>{title}</Text>
-            <Text style={styles.flightStartLabel}>
-              {t.start}:
-            </Text>
-          </View>
 
-          {/* Flight Rows */}
-          {flights.map((leg, i) => (
-            <View key={i} style={styles.flightLeg}>
-              <View style={styles.flightInfoRow}>
-                <View style={styles.flightRowCenter}>
-                  <Text style={styles.flightNumber}>{leg.flightNumber}</Text>
-                  <Text style={styles.flightDate}>
-                    {dayjs(leg.date).format("DD/MM/YYYY")}
-                  </Text>
-                  <Text style={styles.timeTag}>{leg.origin.time}</Text>
-
-                  <View style={styles.originContainer}>
-                    <Text style={styles.cityName}>
-                      {leg.origin.city}
-                    </Text>
-                    <Text style={styles.airportCodeOrigin}>
-                      {leg.origin.code}
-                    </Text>
-                  </View>
-
-                  <View style={styles.durationContainer}>
-                    <Text style={styles.durationDotsLeft}>
-                      ••••
-                    </Text>
-                    <PlaneIcon
-                      size={12}
-                      color="#f05a22"
-                      style={styles.planeIconWrapper}
-                    />
-                    <Text style={styles.durationTime}>
-                      {leg.duration}
-                    </Text>
-                    <Text style={styles.durationDotsRight}>
-                      ••••
-                    </Text>
-                  </View>
-
-                  <View style={styles.destinationContainer}>
-                    <Text style={styles.airportCodeDestination}>
-                      {leg.destination.code}
-                    </Text>
-                    <Text style={styles.cityName}>
-                      {leg.destination.city}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.flightRowCenter}>
-                  <Text style={styles.timeTag}>{leg.destination.time}</Text>
-                  <Text style={styles.flightDate}>
-                    {dayjs(leg.date).format("DD/MM/YYYY")}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          ))}
-        </View>
-      );
-    };
 
     return (
       <Document>
@@ -259,8 +179,16 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
           </View>
 
           {/* Flights */}
-          {renderFlightSection(flightGroups.outbound, t.outboundFlight)}
-          {renderFlightSection(flightGroups.inbound, t.returnFlight)}
+          <FlightSection
+            flights={flightGroups.outbound}
+            title={t.outboundFlight}
+            startLabel={t.start}
+          />
+          <FlightSection
+            flights={flightGroups.inbound}
+            title={t.returnFlight}
+            startLabel={t.start}
+          />
 
           {/* QR */}
           {data.airline.checkInUrl?.trim() && qrCodeImageString ? (

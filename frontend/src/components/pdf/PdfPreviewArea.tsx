@@ -6,32 +6,41 @@ import { Download } from "lucide-react";
 
 interface PdfPreviewAreaProps {
   pdfData: ConfirmationData;
+  qrCodeImageString?: string;
 }
 
-export const PdfPreviewArea = memo<PdfPreviewAreaProps>(({ pdfData }) => {
-  return (
-    <div className="preview-area">
-      <div className="preview-header">
-        <h2>Visualização</h2>
-        <PDFDownloadLink
-          document={<FlightConfirmationPdf data={pdfData} locale={pdfData.language} />}
-          fileName={`confirmacion-${pdfData.locator}.pdf`}
-        >
-          {({ loading }) => (
-            <button className="btn-primary" disabled={loading}>
-              <Download size={16} style={{ marginRight: 5 }} />
-              {loading ? "Gerando..." : "Baixar PDF"}
-            </button>
-          )}
-        </PDFDownloadLink>
+export const PdfPreviewArea = memo<PdfPreviewAreaProps>(
+  ({ pdfData, qrCodeImageString }) => {
+    return (
+      <div className="preview-area">
+        <div className="preview-header">
+          <h2>Visualização</h2>
+          <PDFDownloadLink
+            document={
+              <FlightConfirmationPdf data={pdfData} locale={pdfData.language} />
+            }
+            fileName={`confirmacion-${pdfData.locator}.pdf`}
+          >
+            {({ loading }) => (
+              <button className="btn-primary" disabled={loading}>
+                <Download size={16} style={{ marginRight: 5 }} />
+                {loading ? "Gerando..." : "Baixar PDF"}
+              </button>
+            )}
+          </PDFDownloadLink>
+        </div>
+        <div className="pdf-wrapper">
+          <PDFViewer width="100%" height="100%" className="pdf-viewer">
+            <FlightConfirmationPdf
+              data={pdfData}
+              locale={pdfData.language}
+              qrCodeImageString={qrCodeImageString}
+            />
+          </PDFViewer>
+        </div>
       </div>
-      <div className="pdf-wrapper">
-        <PDFViewer width="100%" height="100%" className="pdf-viewer">
-          <FlightConfirmationPdf data={pdfData} locale={pdfData.language} />
-        </PDFViewer>
-      </div>
-    </div>
-  );
-});
+    );
+  },
+);
 
 PdfPreviewArea.displayName = "PdfPreviewArea";

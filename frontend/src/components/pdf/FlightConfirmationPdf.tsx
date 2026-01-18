@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from "react";
-import { Document, Page, Text, View, Image } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, Link } from "@react-pdf/renderer";
 import type { ConfirmationData, FlightLeg, Language } from "../../types";
 import { styles } from "./PdfStyles";
 import dayjs from "dayjs";
@@ -19,15 +19,15 @@ import {
 
 interface FlightConfirmationPdfProps {
   data: ConfirmationData;
+  qrCodeImageString?: string;
   locale?: Language;
 }
 
 // TODO divide this in different components
 // TODO fix font and styles related to fonts
-// TODO add QR logic
 // TODO add new text and style for new text
 const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
-  ({ data, locale = "pt" }) => {
+  ({ data, qrCodeImageString = "", locale = "pt" }) => {
     const t = translations[locale] || translations.pt;
 
     const flightGroups = useMemo(() => {
@@ -308,42 +308,30 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
           {renderFlightSection(flightGroups.inbound, t.returnFlight)}
 
           {/* QR */}
-          <View style={styles.footer}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "normal",
-                color: "#000",
-                marginBottom: 5,
-              }}
-            >
-              {t.findFlight}
-            </Text>
-            <Text style={{ fontSize: 10, color: "#666" }}>{t.scanQr}</Text>
+          {data.airline.checkInUrl?.trim() && qrCodeImageString ? (
+            <View style={styles.footer}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "normal",
+                  color: "#000",
+                  marginBottom: 5,
+                }}
+              >
+                {t.findFlight}
+              </Text>
+              <Text style={{ fontSize: 10, color: "#666" }}>{t.scanQr}</Text>
 
-            <View style={styles.qrSection}>
-              {data.airline.checkInUrl?.startsWith("data:image") ||
-              data.airline.checkInUrl?.startsWith("http") ? (
-                <Image style={styles.qrCode} src={data.airline.checkInUrl} />
-              ) : (
-                // Placeholder QR
-                <View
-                  style={{
-                    width: 100,
-                    height: 100,
-                    padding: 10,
-                    backgroundColor: "blue",
-                  }}
-                >
-                  <Image
-                    style={{ width: 100, height: 100 }}
-                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Example"
-                  />
-                </View>
-              )}
-              <Text style={{ fontSize: 8, marginTop: 5 }}>{t.clickOrScan}</Text>
+              <View style={styles.qrSection}>
+                <Link src={data.airline.checkInUrl}>
+                  <Image style={styles.qrCode} src={qrCodeImageString} />
+                </Link>
+                <Text style={{ fontSize: 8, marginTop: 5 }}>
+                  {t.clickOrScan}
+                </Text>
+              </View>
             </View>
-          </View>
+          ) : null}
         </Page>
         <Page size="A4" style={styles.page}>
           <View style={styles.footer}>
@@ -390,7 +378,7 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
         </Page>
       </Document>
     );
-  }
+  },
 );
 
 FlightConfirmationPdf.displayName = "FlightConfirmationPdf";

@@ -16,6 +16,7 @@ import {
   SuitcaseRollingIcon,
   AirplaneTiltFillIcon,
 } from "./PdfIcons";
+import AdditionalInfoPage from "./AdditionalInfoPage";
 
 interface FlightConfirmationPdfProps {
   data: ConfirmationData;
@@ -40,16 +41,16 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
     const renderFlightSection = (flights: FlightLeg[], title: string) => {
       if (!flights.length) return null;
       return (
-        <View style={{ marginBottom: 10 }}>
+        <View style={styles.flightSectionWrapper}>
           {/* Title Row */}
           <View style={styles.flightSectionTitle}>
             <AirplaneTiltFillIcon
               size={14}
               color="#f05a22"
-              style={{ marginRight: 5 }}
+              style={styles.iconMarginRight}
             />
             <Text style={styles.flightTitleText}>{title}</Text>
-            <Text style={{ fontSize: 10, color: "#666", marginLeft: 5 }}>
+            <Text style={styles.flightStartLabel}>
               {t.start}:
             </Text>
           </View>
@@ -58,83 +59,50 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
           {flights.map((leg, i) => (
             <View key={i} style={styles.flightLeg}>
               <View style={styles.flightInfoRow}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={styles.flightRowCenter}>
                   <Text style={styles.flightNumber}>{leg.flightNumber}</Text>
                   <Text style={styles.flightDate}>
                     {dayjs(leg.date).format("DD/MM/YYYY")}
                   </Text>
                   <Text style={styles.timeTag}>{leg.origin.time}</Text>
 
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "flex-end",
-                      width: 80,
-                    }}
-                  >
-                    <Text style={{ fontSize: 9, color: "#333", maxWidth: 50 }}>
+                  <View style={styles.originContainer}>
+                    <Text style={styles.cityName}>
                       {leg.origin.city}
                     </Text>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: "bold",
-                        marginLeft: 5,
-                      }}
-                    >
+                    <Text style={styles.airportCodeOrigin}>
                       {leg.origin.code}
                     </Text>
                   </View>
 
                   <View style={styles.durationContainer}>
-                    <Text
-                      style={{ fontSize: 10, color: "#bbb", marginRight: 3 }}
-                    >
+                    <Text style={styles.durationDotsLeft}>
                       ••••
                     </Text>
                     <PlaneIcon
                       size={12}
                       color="#f05a22"
-                      style={{
-                        marginHorizontal: 2,
-                        transform: "rotate(90deg)",
-                      }}
+                      style={styles.planeIconWrapper}
                     />
-                    <Text style={{ fontSize: 9, fontWeight: "bold" }}>
+                    <Text style={styles.durationTime}>
                       {leg.duration}
                     </Text>
-                    <Text
-                      style={{ fontSize: 10, color: "#bbb", marginLeft: 3 }}
-                    >
+                    <Text style={styles.durationDotsRight}>
                       ••••
                     </Text>
                   </View>
 
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "flex-start",
-                      width: 80,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: "bold",
-                        marginRight: 5,
-                      }}
-                    >
+                  <View style={styles.destinationContainer}>
+                    <Text style={styles.airportCodeDestination}>
                       {leg.destination.code}
                     </Text>
-                    <Text style={{ fontSize: 9, color: "#333", maxWidth: 50 }}>
+                    <Text style={styles.cityName}>
                       {leg.destination.city}
                     </Text>
                   </View>
                 </View>
 
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={styles.flightRowCenter}>
                   <Text style={styles.timeTag}>{leg.destination.time}</Text>
                   <Text style={styles.flightDate}>
                     {dayjs(leg.date).format("DD/MM/YYYY")}
@@ -173,9 +141,7 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
               {data.airline.logoUrl ? (
                 <Image style={styles.airlineLogo} src={data.airline.logoUrl} />
               ) : (
-                <Text
-                  style={{ fontSize: 14, fontWeight: "bold", color: "#f05a22" }}
-                >
+                <Text style={styles.airlineNameFallback}>
                   {data.airline.name}
                 </Text>
               )}
@@ -186,23 +152,12 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
 
           {/* Passengers */}
           <View style={styles.subHeader}>
-            <UserIcon size={14} color="#333" style={{ marginRight: 5 }} />
-            <Text
-              style={{
-                fontSize: 12,
-                fontWeight: "bold",
-                textTransform: "uppercase",
-              }}
-            >
+            <UserIcon size={14} color="#333" style={styles.iconMarginRight} />
+            <Text style={styles.textBold12Upper}>
               {t.travelers}:
             </Text>
             <View style={styles.numberContainer}>
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: "bold",
-                }}
-              >
+              <Text style={styles.textBold12}>
                 {data.passengers.length}
               </Text>
             </View>
@@ -310,72 +265,23 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
           {/* QR */}
           {data.airline.checkInUrl?.trim() && qrCodeImageString ? (
             <View style={styles.footer}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "normal",
-                  color: "#000",
-                  marginBottom: 5,
-                }}
-              >
+              <Text style={styles.findFlightTitle}>
                 {t.findFlight}
               </Text>
-              <Text style={{ fontSize: 10, color: "#666" }}>{t.scanQr}</Text>
+              <Text style={styles.scanQrText}>{t.scanQr}</Text>
 
               <View style={styles.qrSection}>
                 <Link src={data.airline.checkInUrl}>
                   <Image style={styles.qrCode} src={qrCodeImageString} />
                 </Link>
-                <Text style={{ fontSize: 8, marginTop: 5 }}>
+                <Text style={styles.clickOrScanText}>
                   {t.clickOrScan}
                 </Text>
               </View>
             </View>
           ) : null}
         </Page>
-        <Page size="A4" style={styles.page}>
-          <View style={styles.footer}>
-            <View style={{ alignSelf: "stretch", marginTop: 20 }}>
-              <Text style={{ fontWeight: "bold", fontSize: 10, color: "#555" }}>
-                {t.importantInfo}
-              </Text>
-              <Text style={styles.legalText}>{t.legalText}</Text>
-
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  fontSize: 10,
-                  color: "#555",
-                  marginTop: 10,
-                }}
-              >
-                {t.boardingInstructions}
-              </Text>
-              {t.boardingList.map((item: string, idx: number) => (
-                <Text
-                  key={idx}
-                  style={{ fontSize: 7, color: "#666", marginTop: 2 }}
-                >
-                  • {item}
-                </Text>
-              ))}
-
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  fontSize: 10,
-                  color: "#555",
-                  marginTop: 10,
-                }}
-              >
-                {t.contact}
-              </Text>
-              <Text style={{ fontSize: 8, color: "#666" }}>
-                • {data.airline.contactPhone}
-              </Text>
-            </View>
-          </View>
-        </Page>
+        <AdditionalInfoPage locale={locale} data={data} />
       </Document>
     );
   },

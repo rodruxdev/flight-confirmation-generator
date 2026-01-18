@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./index.css";
 import ConfirmationForm from "./components/form/ConfirmationForm.tsx";
 import { PassengerType, type ConfirmationData } from "./types.ts";
@@ -6,6 +6,7 @@ import { AirlinesInfo } from "./constants.ts";
 import { Airlines } from "./types.ts";
 import { Check } from "lucide-react";
 import { PdfPreviewArea } from "./components/pdf/PdfPreviewArea.tsx";
+import { generateQrCode } from "./util/generateQrCode.ts";
 
 const INITIAL_DATA: ConfirmationData = {
   locator: "UKIQHA",
@@ -40,7 +41,6 @@ const INITIAL_DATA: ConfirmationData = {
   ],
   airline: {
     ...AirlinesInfo[Airlines.GOL],
-    checkInUrl: "https://google.com",
   },
   language: "pt",
 };
@@ -48,10 +48,35 @@ const INITIAL_DATA: ConfirmationData = {
 function App() {
   const [formData, setFormData] = useState<ConfirmationData>(INITIAL_DATA);
   const [pdfData, setPdfData] = useState<ConfirmationData>(INITIAL_DATA);
+  const [qrCodeImageString, setQrCodeImageString] = useState<string>("");
 
-  const handleApply = () => {
-    setPdfData(formData);
+  const handleApply = async () => {
+    try {
+      const qrCodeData = await generateQrCode(formData.airline.checkInUrl);
+      setQrCodeImageString(qrCodeData);
+      setPdfData(formData);
+    } catch (error: unknown) {
+      console.error(error);
+    }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      const url = formData.airline.baseCheckInUrl;
+      if (!url) return;
+      const qr = await generateQrCode(url);
+      if (!cancelled) setQrCodeImageString(qr);
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="app-container">
@@ -69,7 +94,7 @@ function App() {
           <Check size={20} />
         </button>
       </div>
-      <PdfPreviewArea pdfData={pdfData} />
+      <PdfPreviewArea pdfData={pdfData} qrCodeImageString={qrCodeImageString} />
     </div>
   );
 }

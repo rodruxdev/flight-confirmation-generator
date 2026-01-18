@@ -259,8 +259,7 @@ export const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 5,
-    objectFit: "contain",
-    backgroundColor: "blue",
+    objectFit: "cover",
   },
   legalText: {
     fontSize: 6,

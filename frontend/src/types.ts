@@ -43,6 +43,7 @@ export interface AirlineInfo {
   name: string;
   logoUrl?: string;
   contactPhone: string;
+  baseCheckInUrl?: string;
   checkInUrl?: string;
 }
 

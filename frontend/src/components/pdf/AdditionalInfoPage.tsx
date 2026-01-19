@@ -37,7 +37,7 @@ const AdditionalInfoPage: React.FC<AdditionalInfoPageProps> = ({
   };
 
   return (
-    <Page size="A4" style={styles.page}>
+    <View style={{marginTop: 20}}>
       <Text style={styles.additionalPageTitle}>
         {info.title}
       </Text>
@@ -78,7 +78,8 @@ const AdditionalInfoPage: React.FC<AdditionalInfoPageProps> = ({
             ))}
         </View>
       ))}
-    </Page>
+
+    </View>
   );
 };
 

@@ -192,7 +192,7 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
 
           {/* QR */}
           {data.airline.checkInUrl?.trim() && qrCodeImageString ? (
-            <View style={styles.footer}>
+            <View style={styles.footer} wrap={false}>
               <Text style={styles.findFlightTitle}>
                 {t.findFlight}
               </Text>
@@ -208,8 +208,9 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
               </View>
             </View>
           ) : null}
+                  <AdditionalInfoPage locale={locale} data={data} />
         </Page>
-        <AdditionalInfoPage locale={locale} data={data} />
+        {/* <AdditionalInfoPage locale={locale} data={data} /> */}
       </Document>
     );
   },

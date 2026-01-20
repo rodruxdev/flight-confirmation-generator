@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { Page, Text, View } from "@react-pdf/renderer";
+import { Text, View } from "@react-pdf/renderer";
 import { translations } from "./TranslationConstants";
 import { styles } from "./PdfStyles";
 import type { Language, ConfirmationData } from "../../types";
@@ -7,11 +8,13 @@ import type { Language, ConfirmationData } from "../../types";
 interface AdditionalInfoPageProps {
   locale: Language;
   data: ConfirmationData;
+  isAdditionalInfoInSamePage: boolean;
 }
 
 const AdditionalInfoPage: React.FC<AdditionalInfoPageProps> = ({
   locale,
   data,
+  isAdditionalInfoInSamePage = false,
 }) => {
   const t = translations[locale] || translations.pt;
   const info = t.additionalPage;
@@ -37,7 +40,7 @@ const AdditionalInfoPage: React.FC<AdditionalInfoPageProps> = ({
   };
 
   return (
-    <Page size="A4" style={styles.page}>
+    <View style={{marginTop: 20}} wrap={isAdditionalInfoInSamePage}>
       <Text style={styles.additionalPageTitle}>
         {info.title}
       </Text>
@@ -78,7 +81,8 @@ const AdditionalInfoPage: React.FC<AdditionalInfoPageProps> = ({
             ))}
         </View>
       ))}
-    </Page>
+
+    </View>
   );
 };
 

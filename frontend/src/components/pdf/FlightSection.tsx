@@ -15,7 +15,7 @@ const FlightSection: React.FC<FlightSectionProps> = ({ flights, title, startLabe
   if (!flights.length) return null;
 
   return (
-    <View style={styles.flightSectionWrapper}>
+    <View style={styles.flightSectionWrapper} wrap={false}>
       {/* Title Row */}
       <View style={styles.flightSectionTitle}>
         <AirplaneTiltFillIcon
@@ -29,14 +29,20 @@ const FlightSection: React.FC<FlightSectionProps> = ({ flights, title, startLabe
         </Text>
       </View>
 
-      {/* Flight Rows */}
       {flights.map((leg, i) => {
-        const isNextDay =
-          Number(leg.destination.time.replace(":", "")) <
-          Number(leg.origin.time.replace(":", ""));
-        const destinationDate = isNextDay
-          ? dayjs(leg.date).add(1, "day").format("DD/MM/YYYY")
-          : dayjs(leg.date).format("DD/MM/YYYY");
+        const departureTime = dayjs(`${leg.date}T${leg.origin.time}`);
+        let arrivalTime = dayjs(`${leg.date}T${leg.destination.time}`);
+
+        if (arrivalTime.isBefore(departureTime)) {
+          arrivalTime = arrivalTime.add(1, "day");
+        }
+
+        const diffMinutes = arrivalTime.diff(departureTime, "minute");
+        const hours = Math.floor(diffMinutes / 60);
+        const minutes = diffMinutes % 60;
+        const durationStr = `${hours}h${minutes.toString().padStart(2, "0")}m`;
+
+        const destinationDate = arrivalTime.format("DD/MM/YYYY");
 
         return (
           <View key={i} style={styles.flightLeg}>
@@ -44,7 +50,7 @@ const FlightSection: React.FC<FlightSectionProps> = ({ flights, title, startLabe
               <View style={styles.flightRowCenter}>
                 <Text style={styles.flightNumber}>{leg.flightNumber}</Text>
                 <Text style={styles.flightDate}>
-                  {dayjs(leg.date).format("DD/MM/YYYY")}
+                  {departureTime.format("DD/MM/YYYY")}
                 </Text>
                 <Text style={styles.timeTag}>{leg.origin.time}</Text>
 
@@ -60,7 +66,7 @@ const FlightSection: React.FC<FlightSectionProps> = ({ flights, title, startLabe
                     color="#f05a22"
                     style={styles.planeIconWrapper}
                   />
-                  <Text style={styles.durationTime}>{leg.duration}</Text>
+                  <Text style={styles.durationTime}>{durationStr}</Text>
                   <Text style={styles.durationDotsRight}>••••</Text>
                 </View>
 

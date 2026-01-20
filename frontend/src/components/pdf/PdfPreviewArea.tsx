@@ -17,7 +17,11 @@ export const PdfPreviewArea = memo<PdfPreviewAreaProps>(
           <h2>Visualização</h2>
           <PDFDownloadLink
             document={
-              <FlightConfirmationPdf data={pdfData} locale={pdfData.language} />
+              <FlightConfirmationPdf 
+                data={pdfData} 
+                locale={pdfData.language}
+                qrCodeImageString={qrCodeImageString}
+              />
             }
             fileName={`confirmacion-${pdfData.locator}.pdf`}
           >

@@ -26,6 +26,11 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
   ({ data, qrCodeImageString = "", locale = "pt" }) => {
     const t = translations[locale] || translations.pt;
 
+    const isAdditionalInfoInSamePage = useMemo(() => {
+      const rowsQuantity = data.passengers.length + data.flights.length  + (data?.returnFlights?.length || 0)
+      return rowsQuantity > 8;
+    }, [data.passengers, data.flights, data.returnFlights]);
+
     const flightGroups = useMemo(() => {
       if (data.returnFlights && data.returnFlights.length > 0) {
         return { outbound: data.flights, inbound: data.returnFlights };
@@ -84,7 +89,7 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
           </View>
 
           {data.passengers.map((p, i) => (
-            <View key={i} style={styles.passengerRow}>
+            <View key={i} style={styles.passengerRow} wrap={false}>
               <View style={styles.passengerTypeIcon}>
                 {p.type === "PET" ? (
                   <PawIcon size={14} color="#333" />
@@ -101,7 +106,7 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
           ))}
 
           {/* Baggage Cards */}
-          <View style={styles.baggageSection}>
+          <View style={styles.baggageSection} wrap={false}>
             <View style={styles.baggageCard}>
               {data.baggage.personalItem > 0 ? (
                 <Text style={styles.baggageStatusPillIncluded}>
@@ -192,7 +197,7 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
 
           {/* QR */}
           {data.airline.checkInUrl?.trim() && qrCodeImageString ? (
-            <View style={styles.footer}>
+            <View style={styles.footer} wrap={false}>
               <Text style={styles.findFlightTitle}>
                 {t.findFlight}
               </Text>
@@ -208,8 +213,8 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
               </View>
             </View>
           ) : null}
+          <AdditionalInfoPage locale={locale} data={data} isAdditionalInfoInSamePage={isAdditionalInfoInSamePage} />
         </Page>
-        <AdditionalInfoPage locale={locale} data={data} />
       </Document>
     );
   },

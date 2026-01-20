@@ -325,7 +325,7 @@ export const styles = StyleSheet.create({
 
   // Footer & QR
   footer: {
-    marginTop: 10,
+    marginTop: 5,
     alignItems: "center",
   },
   findFlightTitle: {

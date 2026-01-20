@@ -35,7 +35,6 @@ export interface FlightLeg {
     city: string;
     time: string;
   };
-  duration: string;
   nextDayArrival?: boolean;
 }
 

@@ -115,7 +115,6 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
     const cleanFlight: FlightLeg = {
       flightNumber: "G3 1234",
       date: new Date().toISOString().split("T")[0],
-      duration: "1h00m",
       origin: { city: "Cidade Origem", code: "ORG", time: "12:00" },
       destination: { city: "Cidade Destino", code: "DST", time: "13:00" },
     };
@@ -157,7 +156,6 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
     const cleanFlight: FlightLeg = {
       flightNumber: "G3 5678",
       date: new Date().toISOString().split("T")[0],
-      duration: "1h30m",
       origin: { city: "Cidade Volta", code: "DST", time: "18:00" },
       destination: { city: "Cidade Origem", code: "ORG", time: "19:30" },
     };

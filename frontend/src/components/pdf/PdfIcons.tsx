@@ -3,6 +3,7 @@ import { Svg, Path } from "@react-pdf/renderer";
 interface IconProps {
   size?: number;
   color?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   style?: any;
 }
 

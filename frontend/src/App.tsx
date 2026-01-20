@@ -20,21 +20,18 @@ const INITIAL_DATA: ConfirmationData = {
     {
       flightNumber: "G31246",
       date: "2026-01-08",
-      duration: "3h00m",
       origin: { city: "Rio Branco", code: "RBR", time: "23:40" },
       destination: { city: "Manaus", code: "MAO", time: "02:40" },
     },
     {
       flightNumber: "G31743",
       date: "2026-01-09",
-      duration: "4h00m",
       origin: { city: "Manaus", code: "MAO", time: "03:25" },
       destination: { city: "Brasília", code: "BSB", time: "07:25" },
     },
     {
       flightNumber: "G31756",
       date: "2026-01-09",
-      duration: "2h00m",
       origin: { city: "Brasília", code: "BSB", time: "08:45" },
       destination: { city: "Curitiba", code: "CWB", time: "10:45" },
     },

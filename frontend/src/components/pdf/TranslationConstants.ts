@@ -1,5 +1,6 @@
 import type { Language } from "../../types";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const translations: Record<Language, any> = {
   pt: {
     bookingReference: "Localizador",

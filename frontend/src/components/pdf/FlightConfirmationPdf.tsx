@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Document, Page, Text, View, Image, Link } from "@react-pdf/renderer";
 import type { ConfirmationData, Language } from "../../types";
 import { styles } from "./PdfStyles";
@@ -25,9 +25,19 @@ interface FlightConfirmationPdfProps {
 const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
   ({ data, qrCodeImageString = "", locale = "pt" }) => {
     const t = translations[locale] || translations.pt;
+    const baseUrl = import.meta.env.BASE_URL;
+    const resolveAssetUrl = (path: string) => {
+      if (path.startsWith("http://") || path.startsWith("https://"))
+        return path;
+      if (path.startsWith("data:")) return path;
+      return `${baseUrl}${path.replace(/^\//, "")}`;
+    };
 
     const isAdditionalInfoInSamePage = useMemo(() => {
-      const rowsQuantity = data.passengers.length + data.flights.length  + (data?.returnFlights?.length || 0)
+      const rowsQuantity =
+        data.passengers.length +
+        data.flights.length +
+        (data?.returnFlights?.length || 0);
       return rowsQuantity > 8;
     }, [data.passengers, data.flights, data.returnFlights]);
 
@@ -38,8 +48,6 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
       return { outbound: data.flights, inbound: [] };
     }, [data.flights, data.returnFlights]);
 
-
-
     return (
       <Document>
         <Page size="A4" style={styles.page}>
@@ -49,7 +57,7 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
             <View style={styles.agencySection}>
               <Image
                 style={styles.agencyLogo}
-                src="/viajando-com-sucesso.png"
+                src={resolveAssetUrl("viajando-com-sucesso.png")}
               />
             </View>
 
@@ -64,7 +72,10 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
             {/* Right: Airline Logo */}
             <View style={styles.airlineSection}>
               {data.airline.logoUrl ? (
-                <Image style={styles.airlineLogo} src={data.airline.logoUrl} />
+                <Image
+                  style={styles.airlineLogo}
+                  src={resolveAssetUrl(data.airline.logoUrl)}
+                />
               ) : (
                 <Text style={styles.airlineNameFallback}>
                   {data.airline.name}
@@ -78,13 +89,9 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
           {/* Passengers */}
           <View style={styles.subHeader}>
             <UserIcon size={14} color="#333" style={styles.iconMarginRight} />
-            <Text style={styles.textBold12Upper}>
-              {t.travelers}:
-            </Text>
+            <Text style={styles.textBold12Upper}>{t.travelers}:</Text>
             <View style={styles.numberContainer}>
-              <Text style={styles.textBold12}>
-                {data.passengers.length}
-              </Text>
+              <Text style={styles.textBold12}>{data.passengers.length}</Text>
             </View>
           </View>
 
@@ -198,22 +205,22 @@ const FlightConfirmationPdf = memo<FlightConfirmationPdfProps>(
           {/* QR */}
           {data.airline.checkInUrl?.trim() && qrCodeImageString ? (
             <View style={styles.footer} wrap={false}>
-              <Text style={styles.findFlightTitle}>
-                {t.findFlight}
-              </Text>
+              <Text style={styles.findFlightTitle}>{t.findFlight}</Text>
               <Text style={styles.scanQrText}>{t.scanQr}</Text>
 
               <View style={styles.qrSection}>
                 <Link src={data.airline.checkInUrl}>
                   <Image style={styles.qrCode} src={qrCodeImageString} />
                 </Link>
-                <Text style={styles.clickOrScanText}>
-                  {t.clickOrScan}
-                </Text>
+                <Text style={styles.clickOrScanText}>{t.clickOrScan}</Text>
               </View>
             </View>
           ) : null}
-          <AdditionalInfoPage locale={locale} data={data} isAdditionalInfoInSamePage={isAdditionalInfoInSamePage} />
+          <AdditionalInfoPage
+            locale={locale}
+            data={data}
+            isAdditionalInfoInSamePage={isAdditionalInfoInSamePage}
+          />
         </Page>
       </Document>
     );

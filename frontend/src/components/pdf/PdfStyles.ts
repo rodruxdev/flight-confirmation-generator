@@ -1,13 +1,19 @@
 import { StyleSheet, Font } from "@react-pdf/renderer";
 
+const baseUrl = import.meta.env.BASE_URL;
+
 // Register Open Sans font family with all variants
 Font.register({
   family: "Open Sans",
   fonts: [
-    { src: "/fonts/OpenSans-Regular.ttf" }, // font-style: normal, font-weight: normal
-    { src: "/fonts/OpenSans-Bold.ttf", fontWeight: "bold" },
-    { src: "/fonts/OpenSans-Italic.ttf", fontStyle: "italic" },
-    { src: "/fonts/OpenSans-BoldItalic.ttf", fontStyle: "italic", fontWeight: "bold" },
+    { src: `${baseUrl}fonts/OpenSans-Regular.ttf` }, // font-style: normal, font-weight: normal
+    { src: `${baseUrl}fonts/OpenSans-Bold.ttf`, fontWeight: "bold" },
+    { src: `${baseUrl}fonts/OpenSans-Italic.ttf`, fontStyle: "italic" },
+    {
+      src: `${baseUrl}fonts/OpenSans-BoldItalic.ttf`,
+      fontStyle: "italic",
+      fontWeight: "bold",
+    },
   ],
 });
 

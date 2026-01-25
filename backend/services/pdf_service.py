@@ -16,17 +16,14 @@ class PdfService:
         # Reset file cursor after reading in extract_raw_data if called sequentially,
         # but here we might need to read it again or pass the content.
         # For efficiency, let's read once.
-        content = await file.read()
+        # content = await file.read()
         
         # We need to seek back to 0 if we want to use the file object again or just use the content
-        await file.seek(0) 
+        # await file.seek(0) 
         
         raw_text = await self.extract_raw_data(file)
         
-        # Select strategy
-        strategy = PdfStrategyFactory.get_strategy(content)
-        
-        # Extract structured data using strategy
+        strategy = PdfStrategyFactory.get_strategy(raw_text)
         extracted_data = strategy.extract_data(raw_text)
         
         return {

@@ -1,8 +1,8 @@
 from .base_strategy import BaseStrategy
-from .initial_strategy import InitialStrategy
+from .reserva_strategy import ReservaStrategy
 
 class PdfStrategyFactory:
     @staticmethod
-    def get_strategy(file_content: bytes) -> BaseStrategy:
-        # logic to determine strategy based on file content could go here
-        return InitialStrategy()
+    def get_strategy(raw_text: str) -> BaseStrategy:
+        # logic to determine strategy based on file content could go here using raw text
+        return ReservaStrategy()

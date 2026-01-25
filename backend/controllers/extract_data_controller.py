@@ -6,7 +6,7 @@ class ExtractDataController:
         self.pdf_service = PdfService()
 
     async def handle_extract_data(self, file: UploadFile):
-        if not file.filename.endswith('.pdf'):
+        if not (file.filename.endswith('.pdf') or file.filename.endswith('.PDF')):
              raise HTTPException(status_code=400, detail="Invalid file type. Only PDF files are allowed.")
         
         try:
